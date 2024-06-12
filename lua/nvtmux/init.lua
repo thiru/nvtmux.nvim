@@ -14,7 +14,7 @@ local M = {
   }
 }
 
-function M.setup()
+function M.setup(opts)
   vim.api.nvim_create_user_command(
     'NvtmuxStart',
     M.start,
@@ -22,13 +22,14 @@ function M.setup()
      desc = 'Start nvtmux mode'})
 
   if c.is_auto_start() then
-    M.start()
+    M.start(opts or {})
   end
 end
 
-function M.start()
+function M.start(opts)
   M.state.is_enabled = true
   c.set_term_opts()
+  c.setup_bufferline(opts.bufferline_opts)
   c.handle_term_close()
   c.keybinds()
   vim.cmd('terminal')

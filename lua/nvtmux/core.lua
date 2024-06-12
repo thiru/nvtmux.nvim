@@ -1,3 +1,5 @@
+local _ = require('nvtmux.utils')
+
 local M = {}
 
 function M.is_auto_start()
@@ -13,6 +15,23 @@ function M.is_term_open()
   return false
 end
 
+function M.setup_bufferline(bufferline_opts)
+  local success, bufferline = pcall(require, 'bufferline')
+
+  if success then
+    local bufferline_setup_spec = {
+      options = vim.tbl_extend(
+        'error',
+        {
+          always_show_bufferline = false,
+          mode = 'tabs'
+        },
+        (bufferline_opts or {}))
+    }
+    bufferline.setup(bufferline_setup_spec)
+  end
+end
+
 function M.set_term_opts()
   vim.opt.cursorline = false
   vim.opt.scrolloff = 0
@@ -21,15 +40,6 @@ function M.set_term_opts()
   vim.opt.signcolumn = 'no'
   vim.cmd.colorscheme 'catppuccin-mocha' --TODO: customise
   vim.opt.laststatus = 0
-
-  -- TODO: use pcall
-  local bufferline_setup_spec = {
-    options = vim.tbl_extend(
-      'error',
-      {mode = 'tabs'},
-      require('custom.plugins.bufferline').opts.options)
-  }
-  require('bufferline').setup(bufferline_setup_spec)
 end
 
 function M.handle_term_close()
