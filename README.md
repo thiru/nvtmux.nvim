@@ -13,6 +13,8 @@ For lazy.nvim:
 ```lua
 {
   'thiru/nvtmux.nvim',
-  config = true
+  opts = {
+    colorscheme = 'catppuccin-mocha'
+  }
 }
 ```
