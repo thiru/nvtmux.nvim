@@ -10,7 +10,8 @@ local M = {
     nvim --cmd 'lua vim.g.nvtmux_auto_start = true'
     ]],
   state = {
-    is_enabled = false
+    is_enabled = false,
+    tab_count = 1
   }
 }
 
@@ -31,9 +32,10 @@ function M.start(opts)
   c.set_term_opts(opts)
   c.setup_bufferline(opts.bufferline_opts)
   c.handle_term_close()
-  c.keybinds()
+  c.keybinds(M.state)
   vim.cmd('terminal')
   vim.cmd('startinsert')
+  vim.cmd('file ' .. M.state.tab_count)
 end
 
 function M.is_enabled()

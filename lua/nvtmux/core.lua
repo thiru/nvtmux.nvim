@@ -63,7 +63,7 @@ function M.handle_term_close()
   })
 end
 
-function M.keybinds()
+function M.keybinds(state)
   -- Safe quit
   vim.keymap.set({ 'n', 'v' },
     '<leader>q',
@@ -111,7 +111,17 @@ function M.keybinds()
   end
 
   -- New tab with terminal
-  vim.keymap.set({'n', 't'}, '<C-t>', '<CMD>tabnew<CR><CMD>terminal<CR><CMD>startinsert<CR>',
+  vim.keymap.set(
+    {'n', 't'},
+    '<C-t>',
+    function()
+      vim.cmd('tabnew')
+      vim.cmd('terminal')
+      vim.cmd('startinsert')
+
+      state.tab_count = state.tab_count + 1
+      vim.cmd('file ' .. state.tab_count)
+    end,
     {desc = 'Open terminal in new tab'})
 
   -- New vertical split with terminal
