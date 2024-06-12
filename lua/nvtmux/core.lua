@@ -39,6 +39,7 @@ function M.set_term_opts(opts)
   vim.opt.relativenumber = false
   vim.opt.signcolumn = 'no'
   vim.opt.laststatus = 0
+  vim.opt.title = true
   if opts.colorscheme ~= nil then
     vim.cmd.colorscheme(opts.colorscheme)
   end
