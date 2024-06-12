@@ -32,14 +32,16 @@ function M.setup_bufferline(bufferline_opts)
   end
 end
 
-function M.set_term_opts()
+function M.set_term_opts(opts)
   vim.opt.cursorline = false
   vim.opt.scrolloff = 0
   vim.opt.number = false
   vim.opt.relativenumber = false
   vim.opt.signcolumn = 'no'
-  vim.cmd.colorscheme 'catppuccin-mocha' --TODO: customise
   vim.opt.laststatus = 0
+  if opts.colorscheme ~= nil then
+    vim.cmd.colorscheme(opts.colorscheme)
+  end
 end
 
 function M.handle_term_close()

@@ -28,7 +28,7 @@ end
 
 function M.start(opts)
   M.state.is_enabled = true
-  c.set_term_opts()
+  c.set_term_opts(opts)
   c.setup_bufferline(opts.bufferline_opts)
   c.handle_term_close()
   c.keybinds()
