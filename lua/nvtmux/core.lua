@@ -150,7 +150,9 @@ function M.keybinds(state)
       vim.ui.input(
         {prompt = 'Tab name: '},
         function(input)
-          vim.cmd('file ' .. input)
+          if input and #input > 0 then
+            vim.cmd('file ' .. input)
+          end
         end)
     end,
     {desc = 'Rename current tab'})
