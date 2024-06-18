@@ -147,13 +147,14 @@ function M.keybinds(state)
     {'n', 't'},
     '<C-n>',
     function()
-      vim.ui.input(
-        {prompt = 'Tab name: '},
-        function(input)
-          if input and #input > 0 then
-            vim.cmd('file ' .. input)
-          end
+      local initial_mode = vim.fn.mode()
+      local keys = vim.api.nvim_replace_termcodes('<C-\\><C-n>:file ', true, true, true)
+      vim.api.nvim_feedkeys(keys, 'n', false)
+      if initial_mode == 't' or initial_mode == 'i' then
+        vim.schedule(function()
+          vim.cmd('startinsert')
         end)
+      end
     end,
     {desc = 'Rename current tab'})
 end
