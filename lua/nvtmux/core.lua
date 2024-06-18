@@ -137,6 +137,19 @@ function M.keybinds(state)
 
   -- Paste
   vim.keymap.set('t', '<C-S-v>', '<C-\\><C-n>pi', { desc = 'Paste from system clipboard (in terminal mode)' })
+
+  -- Rename tab
+  vim.keymap.set(
+    {'n', 't'},
+    '<C-n>',
+    function()
+      vim.ui.input(
+        {prompt = 'Tab name: '},
+        function(input)
+          vim.cmd('file ' .. input)
+        end)
+    end,
+    {desc = 'Rename current tab'})
 end
 
 return M
