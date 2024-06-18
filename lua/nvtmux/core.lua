@@ -65,7 +65,7 @@ end
 
 function M.keybinds(state)
   -- Safe quit
-  vim.keymap.set({ 'n', 'v' },
+  vim.keymap.set({'n', 'v'},
     '<leader>q',
     function()
       if M.is_term_open() then
@@ -80,10 +80,10 @@ function M.keybinds(state)
     { desc = 'Confirm quitting Neovim when terminals are still open' })
 
   -- Previous/next tab
-  vim.keymap.set({'n', 't'}, '<C-S-TAB>', '<CMD>tabprevious<CR>', { desc = 'Next tab', silent = true })
-  vim.keymap.set({'n', 't'}, '<C-TAB>', '<CMD>tabnext<CR>', { desc = 'Previous tab', silent = true })
-  vim.keymap.set({'n', 't'}, '<C-S-j>', '<CMD>tabprevious<CR>', { desc = 'Next tab', silent = true })
-  vim.keymap.set({'n', 't'}, '<C-S-k>', '<CMD>tabnext<CR>', { desc = 'Previous tab', silent = true })
+  vim.keymap.set({'n', 't'}, '<C-S-TAB>', '<CMD>tabprevious<CR>', {desc = 'Next tab', silent = true})
+  vim.keymap.set({'n', 't'}, '<C-TAB>', '<CMD>tabnext<CR>', {desc = 'Previous tab', silent = true})
+  vim.keymap.set({'n', 't'}, '<C-S-j>', '<CMD>tabprevious<CR>', {desc = 'Next tab', silent = true})
+  vim.keymap.set({'n', 't'}, '<C-S-k>', '<CMD>tabnext<CR>', {desc = 'Previous tab', silent = true})
 
   -- Go to tab #
   local function goto_tabnr(tabnr, all_tabs)
@@ -133,10 +133,10 @@ function M.keybinds(state)
     {desc = 'Open terminal in new horizontal split'})
 
   -- Terminal - ESC
-  vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+  vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', {desc = 'Exit terminal mode'})
 
   -- Paste
-  vim.keymap.set('t', '<C-S-v>', '<C-\\><C-n>pi', { desc = 'Paste from system clipboard (in terminal mode)' })
+  vim.keymap.set('t', '<C-S-v>', '<C-\\><C-n>pi', {desc = 'Paste from system clipboard (in terminal mode)'})
 
   -- Rename tab
   vim.keymap.set(
