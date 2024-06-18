@@ -54,9 +54,11 @@ function M.handle_term_close()
       end
 
       -- Exit if no there are no more terminals open
-      if not M.is_term_open() then
-        vim.cmd(':q')
-      end
+      vim.schedule(function()
+        if not M.is_term_open() then
+          vim.cmd(':q')
+        end
+      end)
     end,
     group = vim.api.nvim_create_augroup('nvtmux', {clear = true}),
     pattern = '*',
@@ -68,16 +70,18 @@ function M.keybinds(state)
   vim.keymap.set({'n', 'v'},
     '<leader>q',
     function()
-      if M.is_term_open() then
-        local choice = vim.fn.confirm('Quit even though terminals are open?', '&Cancel\n&Quit')
-        if choice == 2 then
+      vim.schedule(function()
+        if M.is_term_open() then
+          local choice = vim.fn.confirm('Quit even though terminals are open?', '&Cancel\n&Quit')
+          if choice == 2 then
+            vim.cmd(':qall')
+          end
+        else
           vim.cmd(':qall')
         end
-      else
-        vim.cmd(':qall')
-      end
+      end)
     end,
-    { desc = 'Confirm quitting Neovim when terminals are still open' })
+    {desc = 'Confirm quitting Neovim when terminals are still open'})
 
   -- Previous/next tab
   vim.keymap.set({'n', 't'}, '<C-S-TAB>', '<CMD>tabprevious<CR>', {desc = 'Next tab', silent = true})
