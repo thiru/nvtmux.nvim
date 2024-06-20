@@ -9,10 +9,7 @@ local M = {
     Can be started with the :NvtmuxStart command or on Neovim startup like so:
     nvim --cmd 'lua vim.g.nvtmux_auto_start = true'
     ]],
-  state = {
-    is_enabled = false,
-    tab_count = 1
-  }
+  core = c
 }
 
 function M.setup(opts)
@@ -30,18 +27,18 @@ function M.setup(opts)
 end
 
 function M.start(opts)
-  M.state.is_enabled = true
+  c.state.is_enabled = true
   c.set_term_opts(opts)
   c.setup_bufferline(opts.bufferline_opts)
   c.handle_term_close()
-  c.keybinds(M.state)
+  c.set_default_keybinds()
   vim.cmd('terminal')
   vim.cmd('startinsert')
-  vim.cmd('file ' .. M.state.tab_count)
+  c.set_tab_name()
 end
 
 function M.is_enabled()
-  return M.state.is_enabled
+  return c.state.is_enabled
 end
 
 return M

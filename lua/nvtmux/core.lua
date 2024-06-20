@@ -1,6 +1,11 @@
 local _ = require('nvtmux.utils')
 
-local M = {}
+local M = {
+  state = {
+    is_enabled = false,
+    tab_count = 1
+  }
+}
 
 function M.is_auto_start()
   return vim.g.nvtmux_auto_start == true
@@ -65,22 +70,79 @@ function M.handle_term_close()
   })
 end
 
-function M.keybinds(state)
+function M.new_tab()
+  vim.cmd('tabnew')
+  vim.cmd('terminal')
+  vim.cmd('startinsert')
+
+  M.state.tab_count = M.state.tab_count + 1
+  vim.cmd('file ' .. M.state.tab_count)
+end
+
+function M.set_tab_name(name)
+  local name_with_idx = name
+
+  if name == nil then
+    name_with_idx = M.state.tab_count
+  else
+    name_with_idx = M.state.tab_count .. ' ' .. name
+  end
+
+  vim.cmd('file ' .. name_with_idx)
+end
+
+function M.rename_tab_prompt()
+  local initial_mode = vim.fn.mode()
+
+  local keys = vim.api.nvim_replace_termcodes('<C-\\><C-n>:file ', true, true, true)
+  vim.api.nvim_feedkeys(keys, 'n', false)
+
+  if initial_mode == 't' or initial_mode == 'i' then
+    vim.schedule(function()
+      vim.cmd('startinsert')
+    end)
+  end
+end
+
+function M.safe_quit()
+  vim.schedule(function()
+    if M.is_term_open() then
+      local choice = vim.fn.confirm('Quit even though terminals are open?', '&Cancel\n&Quit')
+      if choice == 2 then
+        vim.cmd(':qall')
+      end
+    else
+      vim.cmd(':qall')
+    end
+  end)
+end
+
+function M.go_to_tab(num)
+  local all_tabs = vim.fn.gettabinfo()
+  if #all_tabs > 1 then
+    if num <= #all_tabs then
+      if vim.fn.mode() == 't' then
+        local keys = vim.api.nvim_replace_termcodes('<C-\\><C-n>' .. all_tabs[num].tabnr .. 'gt<CR>i', true, true, true)
+        vim.api.nvim_feedkeys(keys, 'n', false)
+      else
+        vim.cmd('normal ' .. all_tabs[num].tabnr .. 'gt')
+      end
+    end
+  end
+end
+
+function M.set_default_keybinds()
+  -- Terminal - ESC
+  vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', {desc = 'Exit terminal mode'})
+
+  -- Paste
+  vim.keymap.set('t', '<C-S-v>', '<C-\\><C-n>pi', {desc = 'Paste from system clipboard (in terminal mode)'})
+
   -- Safe quit
-  vim.keymap.set({'n', 'v'},
+  vim.keymap.set(
+    {'n', 'v'},
     '<leader>q',
-    function()
-      vim.schedule(function()
-        if M.is_term_open() then
-          local choice = vim.fn.confirm('Quit even though terminals are open?', '&Cancel\n&Quit')
-          if choice == 2 then
-            vim.cmd(':qall')
-          end
-        else
-          vim.cmd(':qall')
-        end
-      end)
-    end,
+    M.safe_quit,
     {desc = 'Confirm quitting Neovim when terminals are still open'})
 
   -- Previous/next tab
@@ -89,27 +151,12 @@ function M.keybinds(state)
   vim.keymap.set({'n', 't'}, '<C-S-j>', '<CMD>tabprevious<CR>', {desc = 'Next tab', silent = true})
   vim.keymap.set({'n', 't'}, '<C-S-k>', '<CMD>tabnext<CR>', {desc = 'Previous tab', silent = true})
 
-  -- Go to tab #
-  local function goto_tabnr(tabnr, all_tabs)
-    if tabnr <= #all_tabs then
-      if vim.fn.mode() == 't' then
-        local keys = vim.api.nvim_replace_termcodes('<C-\\><C-n>' .. all_tabs[tabnr].tabnr .. 'gt<CR>i', true, true, true)
-        vim.api.nvim_feedkeys(keys, 'n', false)
-      else
-        vim.cmd('normal ' .. all_tabs[tabnr].tabnr .. 'gt')
-      end
-    end
-  end
-
   for i=1,9 do
     vim.keymap.set(
       {'i', 'n', 't', 'v'},
       '<C-' .. i .. '>',
       function()
-        local all_tabs = vim.fn.gettabinfo()
-        if #all_tabs > 1 then
-          goto_tabnr(i, all_tabs)
-        end
+        M.go_to_tab(i)
       end,
       {desc = 'Go to tab by index', silent=true})
   end
@@ -118,14 +165,7 @@ function M.keybinds(state)
   vim.keymap.set(
     {'n', 't'},
     '<C-t>',
-    function()
-      vim.cmd('tabnew')
-      vim.cmd('terminal')
-      vim.cmd('startinsert')
-
-      state.tab_count = state.tab_count + 1
-      vim.cmd('file ' .. state.tab_count)
-    end,
+    M.new_tab,
     {desc = 'Open terminal in new tab'})
 
   -- New vertical split with terminal
@@ -136,26 +176,11 @@ function M.keybinds(state)
   vim.keymap.set({'n', 't'}, '<C-S-h>', '<C-\\><C-N><C-w>s<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
     {desc = 'Open terminal in new horizontal split'})
 
-  -- Terminal - ESC
-  vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', {desc = 'Exit terminal mode'})
-
-  -- Paste
-  vim.keymap.set('t', '<C-S-v>', '<C-\\><C-n>pi', {desc = 'Paste from system clipboard (in terminal mode)'})
-
   -- Rename tab
   vim.keymap.set(
     {'n', 't'},
     '<C-n>',
-    function()
-      local initial_mode = vim.fn.mode()
-      local keys = vim.api.nvim_replace_termcodes('<C-\\><C-n>:file ', true, true, true)
-      vim.api.nvim_feedkeys(keys, 'n', false)
-      if initial_mode == 't' or initial_mode == 'i' then
-        vim.schedule(function()
-          vim.cmd('startinsert')
-        end)
-      end
-    end,
+    M.rename_tab_prompt,
     {desc = 'Rename current tab'})
 end
 
