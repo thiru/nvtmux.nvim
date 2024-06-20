@@ -131,6 +131,25 @@ function M.go_to_tab(num)
   end
 end
 
+function M.move_tab(dir)
+  local initial_mode = vim.fn.mode()
+
+  local keys = vim.api.nvim_replace_termcodes('<C-\\><C-n>', true, true, true)
+  vim.api.nvim_feedkeys(keys, 'n', false)
+
+  if dir == 'left' then
+    vim.cmd('-tabmove')
+  else
+    vim.cmd('+tabmove')
+  end
+
+  if initial_mode == 't' or initial_mode == 'i' then
+    vim.schedule(function()
+      vim.cmd('startinsert')
+    end)
+  end
+end
+
 function M.set_default_keybinds()
   -- Terminal - ESC
   vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', {desc = 'Exit terminal mode'})
@@ -182,6 +201,9 @@ function M.set_default_keybinds()
     '<C-n>',
     M.rename_tab_prompt,
     {desc = 'Rename current tab'})
+
+  vim.keymap.set({'n', 't'}, '<C-,>', function() M.move_tab('left') end, {desc = 'Move tab to the left'})
+  vim.keymap.set({'n', 't'}, '<C-.>', function() M.move_tab('right') end, {desc = 'Move tab to the right'})
 end
 
 return M
