@@ -29,7 +29,6 @@ end
 function M.start(opts)
   c.state.is_enabled = true
   c.set_term_opts(opts)
-  c.setup_bufferline(opts.bufferline_opts)
   c.handle_term_close()
   c.set_default_keybinds()
   vim.cmd('terminal')
