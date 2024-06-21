@@ -3,7 +3,6 @@ local _ = require('nvtmux.utils')
 local M = {
   state = {
     is_enabled = false,
-    tab_count = 1
   }
 }
 
@@ -57,21 +56,10 @@ function M.new_tab()
   vim.cmd('tabnew')
   vim.cmd('terminal')
   vim.cmd('startinsert')
-
-  M.state.tab_count = M.state.tab_count + 1
-  vim.cmd('file ' .. M.state.tab_count)
 end
 
 function M.set_tab_name(name)
-  local name_with_idx = name
-
-  if name == nil then
-    name_with_idx = M.state.tab_count
-  else
-    name_with_idx = M.state.tab_count .. ' ' .. name
-  end
-
-  vim.cmd('file ' .. name_with_idx)
+  vim.cmd('file ' .. name)
 end
 
 function M.rename_tab_prompt()

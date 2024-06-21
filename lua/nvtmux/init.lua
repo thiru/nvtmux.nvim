@@ -33,7 +33,6 @@ function M.start(opts)
   c.set_default_keybinds()
   vim.cmd('terminal')
   vim.cmd('startinsert')
-  c.set_tab_name()
 end
 
 function M.is_enabled()
