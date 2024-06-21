@@ -58,10 +58,6 @@ function M.new_tab()
   vim.cmd('startinsert')
 end
 
-function M.set_tab_name(name)
-  vim.cmd('file ' .. name)
-end
-
 function M.rename_tab_prompt()
   local initial_mode = vim.fn.mode()
 
