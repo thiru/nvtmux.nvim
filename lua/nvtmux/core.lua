@@ -151,22 +151,13 @@ function M.go_to_tab(num)
 end
 
 function M.move_tab(dir)
-  local initial_mode = vim.fn.mode()
-
-  local keys = vim.api.nvim_replace_termcodes('<C-\\><C-n>', true, true, true)
-  vim.api.nvim_feedkeys(keys, 'n', false)
-
   if dir == 'left' then
     vim.cmd('-tabmove')
   else
     vim.cmd('+tabmove')
   end
 
-  if initial_mode == 't' or initial_mode == 'i' then
-    vim.schedule(function()
-      vim.cmd('startinsert')
-    end)
-  end
+  vim.cmd('redraw!')
 end
 
 function M.set_default_keybinds()
