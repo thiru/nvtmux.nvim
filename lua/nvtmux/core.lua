@@ -190,19 +190,25 @@ function M.set_default_keybinds()
       {desc = 'Go to tab by index', silent=true})
   end
 
-  -- New tab with terminal
+  -- New terminal tab
   vim.keymap.set(
     {'n', 't'},
     '<C-t>',
     M.new_tab,
     {desc = 'Open terminal in new tab'})
 
-  -- New vertical split with terminal
-  vim.keymap.set({'n', 't'}, '<C-S-t>', '<C-\\><C-N><C-w>v<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
+  -- New vertical split terminal
+  vim.keymap.set(
+    {'n', 't'},
+    '<C-S-t>',
+    '<C-\\><C-N><C-w>v<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
     {desc = 'Open terminal in new vertical split'})
 
-  -- New horizontal split with terminal
-  vim.keymap.set({'n', 't'}, '<C-S-h>', '<C-\\><C-N><C-w>s<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
+  -- New horizontal split terminal
+  vim.keymap.set(
+    {'n', 't'},
+    '<C-S-h>',
+    '<C-\\><C-N><C-w>s<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
     {desc = 'Open terminal in new horizontal split'})
 
   -- Rename tab
