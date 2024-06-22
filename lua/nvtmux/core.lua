@@ -208,7 +208,7 @@ function M.set_default_keybinds()
   -- Rename tab
   vim.keymap.set(
     {'n', 't'},
-    '<C-n>',
+    '<C-S-r>',
     M.rename_tab_prompt,
     {desc = 'Rename current tab'})
 
