@@ -82,7 +82,7 @@ function M.handle_term_close()
       -- Exit if no there are no more terminals open
       vim.schedule(function()
         if not M.is_term_open() then
-          vim.cmd(':q')
+          vim.cmd.quit()
         end
       end)
     end,
@@ -93,8 +93,8 @@ end
 
 function M.new_tab()
   vim.cmd('tabnew')
-  vim.cmd('terminal')
-  vim.cmd('startinsert')
+  vim.cmd.terminal()
+  vim.cmd.startinsert()
 end
 
 function M.create_nui_input()
@@ -128,10 +128,10 @@ function M.safe_quit()
     if M.is_term_open() then
       local choice = vim.fn.confirm('Quit even though terminals are open?', '&Cancel\n&Quit')
       if choice == 2 then
-        vim.cmd(':qall')
+        vim.cmd.qall()
       end
     else
-      vim.cmd(':qall')
+      vim.cmd.qall()
     end
   end)
 end

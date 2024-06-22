@@ -31,8 +31,8 @@ function M.start(opts)
   c.set_term_opts(opts)
   c.handle_term_close()
   c.set_default_keybinds()
-  vim.cmd('terminal')
-  vim.cmd('startinsert')
+  vim.cmd.terminal()
+  vim.cmd.startinsert()
 end
 
 function M.is_enabled()
