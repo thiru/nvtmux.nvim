@@ -190,6 +190,9 @@ function M.set_default_keybinds()
       {desc = 'Go to tab by index', silent=true})
   end
 
+  -- Last accessed tab
+  vim.keymap.set({'n', 't'}, '<C-`>', '<CMD>:tabnext #<CR>', {desc = 'Go to last accessed tab', silent = true})
+
   -- New terminal tab
   vim.keymap.set(
     {'n', 't'},
