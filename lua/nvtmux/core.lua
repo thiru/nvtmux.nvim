@@ -1,5 +1,5 @@
-local Input = require("nui.input")
-local event = require("nui.utils.autocmd").event
+local Input = require('nui.input')
+local event = require('nui.utils.autocmd').event
 local _ = require('nvtmux.utils')
 
 local M = {
@@ -100,7 +100,7 @@ end
 function M.create_nui_input()
   local input = Input(M.rename_tab_popup_opts, M.rename_tab_input_opts)
 
-  input:map("n", "<Esc>", function()
+  input:map('n', '<Esc>', function()
     input:unmount()
   end, {noremap = true})
 
