@@ -76,6 +76,20 @@ function M.set_term_opts(opts)
 end
 
 function M.handle_term_close()
+  -- When switching tabs ensure we're in terminal insert mode
+  vim.api.nvim_create_autocmd('TabEnter', {
+    callback = function ()
+      vim.schedule(function ()
+        local terminal_job_id = vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')
+        if terminal_job_id ~= nil and vim.fn.mode() ~= 't' then
+          vim.cmd.startinsert()
+        end
+      end)
+    end,
+    group = vim.api.nvim_create_augroup('nvtmux_tabenter', {clear = true}),
+    pattern = '*',
+  })
+
   vim.api.nvim_create_autocmd('TermClose', {
     callback = function()
       -- If we've come into another terminal ensure we're in insert mode
@@ -90,7 +104,7 @@ function M.handle_term_close()
         end
       end)
     end,
-    group = vim.api.nvim_create_augroup('nvtmux', {clear = true}),
+    group = vim.api.nvim_create_augroup('nvtmux_termclose', {clear = true}),
     pattern = '*',
   })
 end
