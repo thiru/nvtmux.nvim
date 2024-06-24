@@ -1,4 +1,5 @@
 local c = require('nvtmux.core')
+local sp = require('nvtmux.ssh-picker')
 local _ = require('nvtmux.utils')
 
 local M = {
@@ -27,6 +28,7 @@ function M.setup(opts)
 end
 
 function M.start(opts)
+  sp.setup()
   c.state.is_enabled = true
   c.set_term_opts(opts)
   c.handle_term_close()

@@ -35,15 +35,19 @@ M.rename_tab_input_opts = {
     end
   end,
   on_submit = function(value)
-    -- NOTE: surrounding tab name in single quotes to avoid collision with files paths in cwd
-    local safe_name = "'" .. value .. "'"
-    vim.api.nvim_buf_set_name(M.state.last_bufnr, safe_name)
-    vim.cmd('redraw!')
+    M.set_tab_name(value)
     if M.state.pre_op_mode == 't' or M.state.pre_op_mode == 'i' then
       vim.cmd.startinsert()
     end
   end
 }
+
+function M.set_tab_name(name, bufnr)
+  -- Surrounding tab name in single quotes to avoid collision with files paths in cwd
+  local safe_name = "'" .. name .. "'"
+  vim.api.nvim_buf_set_name(bufnr or M.state.last_bufnr, safe_name)
+  vim.cmd('redraw!')
+end
 
 function M.is_auto_start()
   return vim.g.nvtmux_auto_start == true
@@ -105,7 +109,6 @@ function M.create_nui_input()
   end, {noremap = true})
 
   input:on(event.BufLeave, function()
-    print('bufleave')
     input:unmount()
   end)
 
@@ -221,8 +224,11 @@ function M.set_default_keybinds()
     M.rename_tab_prompt,
     {desc = 'Rename current tab'})
 
+  -- Move tab left/right
   vim.keymap.set({'n', 't'}, '<C-,>', function() M.move_tab('left') end, {desc = 'Move tab to the left'})
   vim.keymap.set({'n', 't'}, '<C-.>', function() M.move_tab('right') end, {desc = 'Move tab to the right'})
+
+  vim.keymap.set({'n', 't'}, '<C-S-s>', '<CMD>:NvtmuxTelescopeSshPicker<CR>', {desc = 'Telescope SSH picker'})
 end
 
 return M
