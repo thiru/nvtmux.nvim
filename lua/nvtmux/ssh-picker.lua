@@ -1,5 +1,5 @@
 local c = require('nvtmux.core')
-local _ = require('nvtmux.utils')
+local u = require('nvtmux.utils')
 
 local M = {}
 
@@ -29,11 +29,11 @@ function M.setup()
   end
 end
 
-function M.parse_hosts()
+function M.parse_ssh_config()
   local source_file = vim.uv.os_homedir() .. '/.ssh/config'
 
   if not vim.uv.fs_stat(source_file) then
-    return {'No remote hosts found in ' .. source_file}
+    return {}
   end
 
   local hosts = {}
@@ -42,6 +42,39 @@ function M.parse_hosts()
     local match = string.match(line, "^%s*Host%s+(.+)%s*$")
     if match and match ~= '*' then
       table.insert(hosts, match)
+    end
+  end
+
+  table.sort(hosts)
+  return hosts
+end
+
+function M.parse_known_hosts()
+  local source_file = vim.uv.os_homedir() .. '/.ssh/known_hosts'
+
+  if not vim.uv.fs_stat(source_file) then
+    return {}
+  end
+
+  local hosts = {}
+
+  for _, line in pairs(vim.fn.readfile(source_file)) do
+    local match = string.match(line, "^%s*([%w.]+)[%s\\,]")
+    if match and not vim.tbl_contains(hosts, match) then
+      table.insert(hosts, match)
+    end
+  end
+
+  table.sort(hosts, u.sort_alpha_before_number)
+  return hosts
+end
+
+function M.parse_hosts()
+  local hosts = M.parse_ssh_config()
+
+  for _, v in pairs(M.parse_known_hosts()) do
+    if not vim.tbl_contains(hosts, v) then
+      table.insert(hosts, v)
     end
   end
 
