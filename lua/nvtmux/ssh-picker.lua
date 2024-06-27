@@ -1,4 +1,3 @@
-local c = require('nvtmux.core')
 local u = require('nvtmux.utils')
 
 local M = {}
@@ -103,9 +102,11 @@ function M.remote_hosts(opts)
         else
           host = selection[1]
         end
+        -- Adding spaces around name to avoid collision with real paths
+        local safe_name = ' ' .. host .. ' '
         vim.cmd.tabnew()
         vim.fn.termopen('ssh ' .. host)
-        c.set_tab_name(host)
+        vim.api.nvim_buf_set_name(0, safe_name)
         vim.schedule(function()
           vim.cmd.startinsert()
         end)
