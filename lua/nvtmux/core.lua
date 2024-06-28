@@ -90,10 +90,10 @@ function M.safe_quit()
     if M.is_term_open() then
       local choice = vim.fn.confirm('Quit even though terminals are open?', '&Cancel\n&Quit')
       if choice == 2 then
-        vim.cmd.qall()
+        vim.cmd('qall!')
       end
     else
-      vim.cmd.qall()
+      vim.cmd('qall!')
     end
   end)
 end
