@@ -80,6 +80,15 @@ function M.parse_hosts()
   return hosts
 end
 
+function M.rename_tab(name)
+  -- Adding spaces around name to avoid collision with a path which may exist locally
+  local safe_name = ' ' .. name .. ' '
+
+  -- Intentionally suppressing rename error. This usually happens when a buffer with the same name
+  -- exists. So, if it fails we just keep the default name, which seems good enough.
+  pcall(function() vim.api.nvim_buf_set_name(0, safe_name) end)
+end
+
 function M.remote_hosts(opts)
   if not M.telescope.success then
     return
@@ -102,11 +111,9 @@ function M.remote_hosts(opts)
         else
           host = selection[1]
         end
-        -- Adding spaces around name to avoid collision with real paths
-        local safe_name = ' ' .. host .. ' '
         vim.cmd.tabnew()
         vim.fn.termopen('ssh ' .. host)
-        vim.api.nvim_buf_set_name(0, safe_name)
+        M.rename_tab(host)
         vim.schedule(function()
           vim.cmd.startinsert()
         end)
