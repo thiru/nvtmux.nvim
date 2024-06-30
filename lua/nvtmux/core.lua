@@ -123,18 +123,27 @@ function M.move_tab(dir)
 end
 
 function M.set_default_keybinds()
+  local has_whichkey = pcall(function() require('which-key') end)
+
+  -- Prefix to launch WhichKey
+  if has_whichkey then
+    vim.keymap.set('t', '<C-a>', '<C-\\><C-N><CMD>WhichKey <C-a><CR>', {desc = 'Launch which-key with terminal-specific functions'})
+  end
+
   -- Terminal - ESC
   vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', {desc = 'Exit terminal mode'})
 
   -- Paste
-  vim.keymap.set('t', '<C-S-v>', '<C-\\><C-n>pi', {desc = 'Paste from system clipboard (in terminal mode)'})
+  vim.keymap.set('t', '<C-S-v>', '<C-\\><C-n>pi', {desc = 'Paste from system clipboard'})
+  if has_whichkey then
+    vim.keymap.set('n', '<C-a>p', 'pi', {desc = 'Paste from system clipboard'})
+  end
 
   -- Safe quit
-  vim.keymap.set(
-    {'n', 'v'},
-    '<leader>q',
-    M.safe_quit,
-    {desc = 'Confirm quitting Neovim when terminals are still open'})
+  vim.keymap.set('n', '<leader>q', M.safe_quit, {desc = 'Confirm quitting Neovim when terminals are still open'})
+  if has_whichkey then
+    vim.keymap.set('n', '<C-a>q', M.safe_quit, {desc = 'Confirm quitting Neovim when terminals are still open'})
+  end
 
   -- Previous/next tab
   vim.keymap.set({'n', 't'}, '<C-S-TAB>', '<CMD>tabprevious<CR>', {desc = 'Next tab', silent = true})
@@ -154,40 +163,58 @@ function M.set_default_keybinds()
 
   -- Last accessed tab
   vim.keymap.set({'n', 't'}, '<C-`>', '<CMD>:tabnext #<CR>', {desc = 'Go to last accessed tab', silent = true})
+  if has_whichkey then
+    vim.keymap.set('n', '<C-a>l', '<CMD>:tabnext #<CR>', {desc = 'Go to last accessed tab', silent = true})
+  end
 
   -- New terminal tab
-  vim.keymap.set(
-    {'n', 't'},
-    '<C-t>',
-    M.new_tab,
-    {desc = 'Open terminal in new tab'})
+  vim.keymap.set({'n', 't'}, '<C-t>', M.new_tab, {desc = 'New terminal tab'})
+  if has_whichkey then
+    vim.keymap.set('n', '<C-a>t', M.new_tab, {desc = 'New terminal tab'})
+  end
 
   -- New vertical split terminal
   vim.keymap.set(
     {'n', 't'},
     '<C-S-t>',
     '<C-\\><C-N><C-w>v<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
-    {desc = 'Open terminal in new vertical split'})
+    {desc = 'New terminal in vertical split'})
+  if has_whichkey then
+    vim.keymap.set(
+      'n',
+      '<C-a>v',
+      '<C-\\><C-N><C-w>v<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
+      {desc = 'New terminal in vertical split'})
+  end
 
   -- New horizontal split terminal
   vim.keymap.set(
     {'n', 't'},
     '<C-S-h>',
     '<C-\\><C-N><C-w>s<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
-    {desc = 'Open terminal in new horizontal split'})
+    {desc = 'New terminal in horizontal split'})
+  if has_whichkey then
+    vim.keymap.set(
+      {'n', 't'},
+      '<C-a>s',
+      '<C-\\><C-N><C-w>s<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
+      {desc = 'New terminal in horizontal split'})
+  end
 
   -- Rename tab
-  vim.keymap.set(
-    {'n', 't'},
-    '<C-S-r>',
-    M.rename_tab_prompt,
-    {desc = 'Rename current tab'})
+  vim.keymap.set({'n', 't'}, '<C-S-r>', M.rename_tab_prompt, {desc = 'Rename current tab'})
+  if has_whichkey then
+    vim.keymap.set('n', '<C-a>r', M.rename_tab_prompt, {desc = 'Rename current tab'})
+  end
 
   -- Move tab left/right
   vim.keymap.set({'n', 't'}, '<C-,>', function() M.move_tab('left') end, {desc = 'Move tab to the left'})
   vim.keymap.set({'n', 't'}, '<C-.>', function() M.move_tab('right') end, {desc = 'Move tab to the right'})
 
-  vim.keymap.set({'n', 't'}, '<C-S-s>', '<CMD>:NvtmuxTelescopeSshPicker<CR>', {desc = 'Telescope SSH picker'})
+  -- Launch SSH picker
+  if has_whichkey then
+    vim.keymap.set('n', '<C-a>s', '<CMD>NvtmuxTelescopeSshPicker<CR>', {desc = 'Telescope SSH picker'})
+  end
 end
 
 return M
