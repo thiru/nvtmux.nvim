@@ -1,3 +1,4 @@
+local tr = require('nvtmux.tab-rename')
 local _ = require('nvtmux.utils')
 
 local M = {
@@ -73,16 +74,13 @@ function M.new_tab()
 end
 
 function M.rename_tab_prompt()
-  local initial_mode = vim.fn.mode()
+  tr.state.last_bufnr = vim.api.nvim_get_current_buf()
+  local input = tr.state.nui_input or tr.create_nui_input()
 
-  local keys = vim.api.nvim_replace_termcodes("<C-\\><C-n>:file ", true, true, true)
-  vim.api.nvim_feedkeys(keys, 'n', false)
-
-  if initial_mode == 't' or initial_mode == 'i' then
-    vim.schedule(function()
-      vim.cmd('startinsert')
-    end)
-  end
+  input:mount()
+  vim.schedule(function()
+    vim.cmd.startinsert()
+  end)
 end
 
 function M.safe_quit()
