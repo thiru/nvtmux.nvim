@@ -36,6 +36,10 @@ M.rename_tab_input_opts = {
 }
 
 function M.set_tab_name(name)
+  if #name == 0 then
+    return
+  end
+
   -- Surrounding tab name with spaces to avoid collision with files paths in cwd
   local safe_name = ' ' .. name .. ' '
   vim.api.nvim_buf_set_name(0, safe_name)
