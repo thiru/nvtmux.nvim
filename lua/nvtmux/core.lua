@@ -11,13 +11,16 @@ function M.is_auto_start()
   return vim.g.nvtmux_auto_start == true
 end
 
-function M.is_term_open()
+function M.num_terms_open()
+  local num_terms = 0
+
   for _, v in pairs(vim.fn.getbufinfo({buflisted = 1})) do
     if v.variables.terminal_job_id ~= nil then
-      return true
+      num_terms = num_terms + 1
     end
   end
-  return false
+
+  return num_terms
 end
 
 function M.set_term_opts(opts)
@@ -57,7 +60,7 @@ function M.handle_term_close()
 
       -- Exit if no there are no more terminals open
       vim.schedule(function()
-        if not M.is_term_open() then
+        if M.num_terms_open() == 0 then
           vim.cmd.quit()
         end
       end)
@@ -85,7 +88,7 @@ end
 
 function M.safe_quit()
   vim.schedule(function()
-    if M.is_term_open() then
+    if M.num_terms_open() > 1 then
       local choice = vim.fn.confirm('Quit even though terminals are open?', '&Cancel\n&Quit')
       if choice == 2 then
         vim.cmd('qall!')
