@@ -211,7 +211,7 @@ function M.set_default_keybinds()
 
   -- Launch SSH picker
   if has_whichkey then
-    vim.keymap.set('n', '<C-a>s', '<CMD>NvtmuxTelescopeSshPicker<CR>', {desc = 'Telescope SSH picker'})
+    vim.keymap.set('n', '<C-a>s', '<CMD>NvtmuxTelescopeSshPicker<CR>', {desc = 'SSH picker'})
   end
 end
 
