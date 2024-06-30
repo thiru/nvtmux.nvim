@@ -15,7 +15,7 @@ M.rename_tab_popup_opts = {
   border = {
     style = 'single',
     text = {
-      top = 'Rename Tab',
+      top = 'Tab Name',
       top_align = 'center',
     },
   },

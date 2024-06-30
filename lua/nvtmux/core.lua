@@ -168,7 +168,12 @@ function M.set_default_keybinds()
   -- New terminal tab
   vim.keymap.set({'n', 't'}, '<C-t>', M.new_tab, {desc = 'New terminal tab'})
   if has_whichkey then
-    vim.keymap.set('n', '<C-a>t', M.new_tab, {desc = 'New terminal tab'})
+    vim.keymap.set('n', '<C-a>t',
+      function()
+        M.new_tab()
+        M.rename_tab_prompt()
+      end,
+      {desc = 'New terminal tab'})
   end
 
   -- New vertical split terminal
