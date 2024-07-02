@@ -126,7 +126,7 @@ end
 function M.set_default_keybinds()
   local has_whichkey = pcall(function() require('which-key') end)
 
-  -- Prefix to launch WhichKey
+  -- Prefix to launch which-key
   if has_whichkey then
     vim.keymap.set('t', '<C-a>', '<C-\\><C-N><CMD>WhichKey <C-a><CR>', {desc = 'Launch which-key with terminal-specific functions'})
   end
@@ -152,6 +152,7 @@ function M.set_default_keybinds()
   vim.keymap.set({'n', 't'}, '<C-S-j>', '<CMD>tabprevious<CR>', {desc = 'Next tab', silent = true})
   vim.keymap.set({'n', 't'}, '<C-S-k>', '<CMD>tabnext<CR>', {desc = 'Previous tab', silent = true})
 
+  -- Go to tab by index
   for i=1,9 do
     vim.keymap.set(
       {'i', 'n', 't', 'v'},
