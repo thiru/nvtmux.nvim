@@ -141,9 +141,9 @@ function M.set_default_keybinds()
   end
 
   -- Safe quit
-  vim.keymap.set('n', '<leader>q', M.safe_quit, {desc = 'Confirm quitting Neovim when terminals are still open'})
+  vim.keymap.set('n', '<leader>q', M.safe_quit, {desc = 'Quit (confirm if multiple terms open)'})
   if has_whichkey then
-    vim.keymap.set('n', '<C-a>q', M.safe_quit, {desc = 'Confirm quitting Neovim when terminals are still open'})
+    vim.keymap.set('n', '<C-a>q', M.safe_quit, {desc = 'Quit (confirm if multiple terms open)'})
   end
 
   -- Previous/next tab
@@ -170,14 +170,14 @@ function M.set_default_keybinds()
   end
 
   -- New terminal tab
-  vim.keymap.set({'n', 't'}, '<C-t>', M.new_tab, {desc = 'New terminal tab'})
+  vim.keymap.set({'n', 't'}, '<C-t>', M.new_tab, {desc = 'New terminal (tab)'})
   if has_whichkey then
     vim.keymap.set('n', '<C-a>t',
       function()
         M.new_tab()
         M.rename_tab_prompt()
       end,
-      {desc = 'New terminal tab'})
+      {desc = 'New terminal (tab)'})
   end
 
   -- New vertical split terminal
@@ -185,13 +185,13 @@ function M.set_default_keybinds()
     {'n', 't'},
     '<C-S-t>',
     '<C-\\><C-N><C-w>v<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
-    {desc = 'New terminal in vertical split'})
+    {desc = 'New terminal (vertical split)'})
   if has_whichkey then
     vim.keymap.set(
       'n',
       '<C-a>v',
       '<C-\\><C-N><C-w>v<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
-      {desc = 'New terminal in vertical split'})
+      {desc = 'New terminal (vertical split)'})
   end
 
   -- New horizontal split terminal
@@ -199,24 +199,24 @@ function M.set_default_keybinds()
     {'n', 't'},
     '<C-S-h>',
     '<C-\\><C-N><C-w>s<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
-    {desc = 'New terminal in horizontal split'})
+    {desc = 'New terminal (horizontal split)'})
   if has_whichkey then
     vim.keymap.set(
       {'n', 't'},
       '<C-a>h',
       '<C-\\><C-N><C-w>s<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
-      {desc = 'New terminal in horizontal split'})
+      {desc = 'New terminal (horizontal split)'})
   end
 
   -- Rename tab
-  vim.keymap.set({'n', 't'}, '<C-S-r>', M.rename_tab_prompt, {desc = 'Rename current tab'})
+  vim.keymap.set({'n', 't'}, '<C-S-r>', M.rename_tab_prompt, {desc = 'Rename tab'})
   if has_whichkey then
-    vim.keymap.set('n', '<C-a>r', M.rename_tab_prompt, {desc = 'Rename current tab'})
+    vim.keymap.set('n', '<C-a>r', M.rename_tab_prompt, {desc = 'Rename tab'})
   end
 
   -- Move tab left/right
-  vim.keymap.set({'n', 't'}, '<C-,>', function() M.move_tab('left') end, {desc = 'Move tab to the left'})
-  vim.keymap.set({'n', 't'}, '<C-.>', function() M.move_tab('right') end, {desc = 'Move tab to the right'})
+  vim.keymap.set({'n', 't'}, '<C-,>', function() M.move_tab('left') end, {desc = 'Move tab left'})
+  vim.keymap.set({'n', 't'}, '<C-.>', function() M.move_tab('right') end, {desc = 'Move tab right'})
 
   -- Launch SSH picker
   if has_whichkey then
