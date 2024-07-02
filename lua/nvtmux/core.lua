@@ -202,7 +202,7 @@ function M.set_default_keybinds()
   if has_whichkey then
     vim.keymap.set(
       {'n', 't'},
-      '<C-a>s',
+      '<C-a>h',
       '<C-\\><C-N><C-w>s<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
       {desc = 'New terminal in horizontal split'})
   end
