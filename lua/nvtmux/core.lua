@@ -15,7 +15,7 @@ function M.num_terms_open()
   local num_terms = 0
 
   for _, v in pairs(vim.fn.getbufinfo({buflisted = 1})) do
-    if v.variables.terminal_job_id ~= nil then
+    if type(v.variables.terminal_job_id) == 'number' then
       num_terms = num_terms + 1
     end
   end
@@ -42,7 +42,7 @@ function M.handle_term_close()
     callback = function ()
       vim.schedule(function ()
         local terminal_job_id = vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')
-        if terminal_job_id ~= nil and vim.fn.mode() ~= 't' then
+        if type(terminal_job_id) == 'number' and vim.fn.mode() ~= 't' then
           vim.cmd.startinsert()
         end
       end)
