@@ -111,16 +111,9 @@ function M.safe_quit()
 end
 
 function M.go_to_tab(num)
-  local all_tabs = vim.fn.gettabinfo()
-  if #all_tabs > 1 then
-    if num <= #all_tabs then
-      if vim.fn.mode() == 't' then
-        local keys = vim.api.nvim_replace_termcodes('<C-\\><C-n>' .. all_tabs[num].tabnr .. 'gt<CR>i', true, true, true)
-        vim.api.nvim_feedkeys(keys, 'n', false)
-      else
-        vim.cmd('normal ' .. all_tabs[num].tabnr .. 'gt')
-      end
-    end
+  local tab_handles = vim.api.nvim_list_tabpages()
+  if (#tab_handles > 1) and (num <= #tab_handles) then
+    vim.api.nvim_set_current_tabpage(tab_handles[num])
   end
 end
 
