@@ -40,10 +40,14 @@ function M.set_tab_name(name)
     return
   end
 
-  -- Surrounding tab name with spaces to avoid collision with files paths in cwd
-  local safe_name = ' ' .. name .. ' '
-  vim.api.nvim_buf_set_name(0, safe_name)
-  vim.cmd('redraw!')
+  if vim.g.loaded_taboo == 1 then
+    vim.cmd('TabooRename ' .. name)
+  else
+    -- Surrounding tab name with spaces to avoid collision with files paths in cwd
+    local safe_name = ' ' .. name .. ' '
+    vim.api.nvim_buf_set_name(0, safe_name)
+    vim.cmd('redraw!')
+  end
 end
 
 function M.create_nui_input()
