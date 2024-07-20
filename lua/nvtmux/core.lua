@@ -11,6 +11,10 @@ function M.is_auto_start()
   return vim.g.nvtmux_auto_start == true
 end
 
+function M.is_terminal_buf()
+  return type(vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')) == 'number'
+end
+
 function M.num_terms_open()
   local num_terms = 0
 
@@ -41,8 +45,7 @@ function M.handle_term_close()
   vim.api.nvim_create_autocmd('TabEnter', {
     callback = function ()
       vim.schedule(function ()
-        local terminal_job_id = vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')
-        if type(terminal_job_id) == 'number' and vim.fn.mode() ~= 't' then
+        if M.is_terminal_buf() and vim.fn.mode() ~= 't' then
           vim.cmd.startinsert()
         end
       end)
@@ -53,9 +56,17 @@ function M.handle_term_close()
 
   vim.api.nvim_create_autocmd('TermClose', {
     callback = function()
-      -- If we've come into another terminal ensure we're in insert mode
-      if vim.fn.mode() == 't' then
-        vim.api.nvim_input('i')
+      -- HACK: If we've come into another terminal buffer, ensure we're in insert mode.
+      -- Not sure why I need to set `startinsert` in a timeout. It doesn't seem to work otherwise.
+      if M.is_terminal_buf() then
+        local timer = vim.uv.new_timer()
+        timer:start(10, 0, function()
+          timer:stop()
+          timer:close()
+          vim.schedule(function()
+            vim.cmd.startinsert()
+          end)
+        end)
       end
 
       -- Exit if no there are no more terminals open
