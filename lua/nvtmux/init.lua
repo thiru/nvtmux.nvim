@@ -29,7 +29,7 @@ end
 function M.start(opts)
   c.state.is_enabled = true
   c.set_term_opts(opts)
-  c.handle_term_close()
+  c.setup_autocmds()
   c.set_default_keybinds()
   vim.cmd.terminal()
   vim.cmd.startinsert()

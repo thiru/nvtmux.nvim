@@ -40,7 +40,7 @@ function M.set_term_opts(opts)
   end
 end
 
-function M.handle_term_close()
+function M.setup_autocmds()
   -- When switching tabs ensure we're in terminal insert mode
   vim.api.nvim_create_autocmd('TabEnter', {
     callback = function ()
