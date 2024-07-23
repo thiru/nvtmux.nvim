@@ -41,9 +41,12 @@ function M.set_term_opts(opts)
 end
 
 function M.setup_autocmds()
-  -- When switching tabs ensure we're in terminal insert mode
   vim.api.nvim_create_autocmd('TabEnter', {
     callback = function ()
+      -- Update window title
+      vim.opt.titlestring = vim.fn.getbufvar('%', 'tab_title') .. ''
+
+      -- When switching tabs ensure we're in terminal insert mode
       vim.schedule(function ()
         if M.is_terminal_buf() and vim.fn.mode() ~= 't' then
           vim.cmd.startinsert()

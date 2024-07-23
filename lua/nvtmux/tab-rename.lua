@@ -48,6 +48,9 @@ function M.set_tab_name(name)
     vim.api.nvim_buf_set_name(0, safe_name)
     vim.cmd('redraw!')
   end
+
+  vim.api.nvim_buf_set_var(0, 'tab_title', name)
+  vim.opt.titlestring = name
 end
 
 function M.create_nui_input()
