@@ -191,13 +191,23 @@ function M.set_default_keybinds()
   vim.keymap.set(
     {'n', 't'},
     '<C-S-t>',
-    '<C-\\><C-N><C-w>v<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
+    function()
+      vim.cmd.vsplit()
+      vim.cmd.enew()
+      vim.cmd.terminal()
+      vim.cmd.startinsert()
+    end,
     {desc = 'New terminal (vertical split)'})
   if has_whichkey then
     vim.keymap.set(
       'n',
       '<C-a>v',
-      '<C-\\><C-N><C-w>v<C-w><C-w><CMD>terminal<CR><CMD>startinsert<CR>',
+      function()
+        vim.cmd.vsplit()
+        vim.cmd.enew()
+        vim.cmd.terminal()
+        vim.cmd.startinsert()
+      end,
       {desc = 'New terminal (vertical split)'})
   end
 
