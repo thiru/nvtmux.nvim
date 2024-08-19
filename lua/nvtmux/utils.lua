@@ -5,7 +5,6 @@ function M.pp(...)
   print(unpack(objects))
 end
 
-
 function M.sort_alpha_before_number(a, b)
   local a_is_alphabetic = string.match(a, "%a.*")
   local b_is_alphabetic = string.match(b, "%a.*")

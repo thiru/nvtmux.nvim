@@ -7,10 +7,6 @@ local M = {
   }
 }
 
-function M.is_auto_start()
-  return vim.g.nvtmux_auto_start == true
-end
-
 function M.is_terminal_buf()
   return type(vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')) == 'number'
 end
