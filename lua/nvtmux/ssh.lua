@@ -21,7 +21,7 @@ M.setup = function(opts)
   M.config = vim.tbl_deep_extend('force', M.config, opts)
 
   vim.api.nvim_create_user_command(
-    'Ssht',
+    'SshPicker',
     M.picker,
     {bang = true,
      desc = 'Open Telescope SSH picker'})
