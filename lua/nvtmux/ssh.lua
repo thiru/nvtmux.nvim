@@ -118,19 +118,19 @@ M.open_ssh_terminal = function(target)
   if M.config.auto_reconnect.when == 'always' then
     cmd = [[sh -c "while true; ]] ..
           [[ssh ']] .. host .. [[' || true; ]] ..
-          [[do echo '[telescope-ssh] Auto-reconnect in ]] ..
+          [[do echo '[nvtmux] Auto-reconnect in ]] ..
           M.config.auto_reconnect.timeout .. [[ second(s)... Press CTRL-C to cancel.'; ]] ..
           [[sleep ]] .. M.config.auto_reconnect.timeout .. [[; done"]]
   elseif M.config.auto_reconnect.when == 'on_error' then
     cmd = [[sh -c "while ! ssh ']] .. host .. [['; ]] ..
-          [[do echo '[telescope-ssh] Auto-reconnect in ]] ..
+          [[do echo '[nvtmux] Auto-reconnect in ]] ..
           M.config.auto_reconnect.timeout .. [[ second(s)... Press CTRL-C to cancel.'; ]] ..
           [[sleep ]] .. M.config.auto_reconnect.timeout .. [[; done"]]
   else
     error('Invalid value for auto-reconnect.when: ' .. M.config.auto_reconnect.when ..
           '. Must be one of: ' .. vim.inspect(M.auto_reconnect_when_enum))
   end
-  vim.notify('[telescope-ssh] ' .. cmd, vim.log.levels.DEBUG)
+  vim.notify('[nvtmux] ' .. cmd, vim.log.levels.DEBUG)
 
   -- Open in current buffer
   if target == 'this' then
