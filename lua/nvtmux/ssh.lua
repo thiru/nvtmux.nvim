@@ -117,11 +117,9 @@ M.open_ssh_terminal = function(target)
   -- Open in current buffer
   if target == 'this' then
     local terminal_job_id = vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')
-    -- Use existing terminal if already running here
+    -- Use existing terminal if one is already running
     if type(terminal_job_id) == 'number' then
-      -- Not auto-reconnecting SSH session here since it's easy enough to reconnect by running the
-      -- last command.
-      vim.api.nvim_chan_send(terminal_job_id, 'ssh "' .. host .. '"\r')
+      vim.api.nvim_chan_send(terminal_job_id, cmd .. '\r')
     else
       vim.fn.termopen(cmd)
     end
