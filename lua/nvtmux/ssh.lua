@@ -1,12 +1,9 @@
-local action_state = require('telescope.actions.state')
-local actions = require('telescope.actions')
-local tconf = require('telescope.config').values
-local finders = require('telescope.finders')
-local pickers = require('telescope.pickers')
 local tr = require('nvtmux.tab-rename')
 local u = require('nvtmux.utils')
 
 local M = {}
+
+M.telescope = nil
 
 M.auto_reconnect_when_enum = { 'never', 'always', 'on_error' }
 
@@ -26,6 +23,17 @@ M.setup = function(opts)
     M.picker,
     {bang = true,
      desc = 'Open Telescope SSH picker'})
+end
+
+M.load_telescope = function()
+  M.telescope = {
+    loaded = true,
+    action_state = require('telescope.actions.state'),
+    actions = require('telescope.actions'),
+    conf = require('telescope.config').values,
+    finders = require('telescope.finders'),
+    pickers = require('telescope.pickers')
+  }
 end
 
 M.parse_ssh_config = function()
@@ -81,11 +89,11 @@ M.parse_hosts = function()
 end
 
 M.get_user_sel_host = function()
-  local selection = action_state.get_selected_entry()
+  local selection = M.telescope.action_state.get_selected_entry()
   local host = ''
 
   if selection == nil then
-    host = action_state.get_current_line()
+    host = M.telescope.action_state.get_current_line()
   else
     host = selection[1]
   end
@@ -146,34 +154,38 @@ end
 M.picker = function(opts)
   opts = opts or {}
 
-  pickers.new(opts, {
+  if M.telescope == nil and (not pcall(M.load_telescope)) then
+    error("Telescope is required for nvtmux's SSH picker")
+  end
+
+  M.telescope.pickers.new(opts, {
     prompt_title = 'SSH Picker',
-    finder = finders.new_table({
+    finder = M.telescope.finders.new_table({
       results = M.parse_hosts()
     }),
-    sorter = tconf.generic_sorter(opts),
+    sorter = M.telescope.conf.generic_sorter(opts),
     attach_mappings = function(prompt_bufnr, _)
       -- Open in the current buffer
-      actions.select_default:replace(function()
-        actions.close(prompt_bufnr)
+      M.telescope.actions.select_default:replace(function()
+        M.telescope.actions.close(prompt_bufnr)
         M.open_ssh_terminal('this')
       end)
 
       -- Open in a new tab
-      actions.select_tab:replace(function()
-        actions.close(prompt_bufnr)
+      M.telescope.actions.select_tab:replace(function()
+        M.telescope.actions.close(prompt_bufnr)
         M.open_ssh_terminal('tab')
       end)
 
       -- Open in a horizontal split
-      actions.select_horizontal:replace(function()
-        actions.close(prompt_bufnr)
+      M.telescope.actions.select_horizontal:replace(function()
+        M.telescope.actions.close(prompt_bufnr)
         M.open_ssh_terminal('split')
       end)
 
       -- Open in a vertical split
-      actions.select_vertical:replace(function()
-        actions.close(prompt_bufnr)
+      M.telescope.actions.select_vertical:replace(function()
+        M.telescope.actions.close(prompt_bufnr)
         M.open_ssh_terminal('vsplit')
       end)
       return true
