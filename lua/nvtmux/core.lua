@@ -53,10 +53,10 @@ function M.setup_autocmds()
     pattern = '*',
   })
 
+  -- Ensure we're in insert mode if we've come into another terminal buffer
   vim.api.nvim_create_autocmd('TermClose', {
     callback = function()
-      -- HACK: If we've come into another terminal buffer, ensure we're in insert mode.
-      -- Not sure why I need to set `startinsert` in a timeout. It doesn't seem to work otherwise.
+      -- HACK: Not sure why I need to set `startinsert` in a timeout. It doesn't seem to work otherwise.
       if M.is_terminal_buf() then
         local timer = vim.uv.new_timer()
         timer:start(10, 0, function()
@@ -67,15 +67,21 @@ function M.setup_autocmds()
           end)
         end)
       end
+    end,
+    group = vim.api.nvim_create_augroup('nvtmux_termclose', {}),
+    pattern = '*',
+  })
 
-      -- Exit if no there are no more terminals open
+  -- Exit if no there are no more terminals open
+  vim.api.nvim_create_autocmd('TermLeave', {
+    callback = function()
       vim.schedule(function()
         if M.num_terms_open() == 0 then
           vim.cmd.quit()
         end
       end)
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_termclose', {clear = true}),
+    group = vim.api.nvim_create_augroup('nvtmux_termleave', {}),
     pattern = '*',
   })
 end
