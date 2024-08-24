@@ -3,6 +3,7 @@ local actions = require('telescope.actions')
 local tconf = require('telescope.config').values
 local finders = require('telescope.finders')
 local pickers = require('telescope.pickers')
+local tr = require('nvtmux.tab-rename')
 local u = require('nvtmux.utils')
 
 local M = {}
@@ -79,25 +80,6 @@ M.parse_hosts = function()
   return hosts
 end
 
-M.rename_tab_or_buf = function(name)
-  if vim.g.loaded_taboo == 1 then
-    vim.cmd('TabooRename ' .. name)
-  else
-    -- Adding spaces around name to avoid collision with a path which may exist locally
-    local safe_name = ' ' .. name .. ' '
-
-    -- Intentionally suppressing rename error. This usually happens when a buffer with the same name
-    -- exists. So, if it fails we just keep the default name, which seems good enough.
-    pcall(function() vim.api.nvim_buf_set_name(0, safe_name) end)
-  end
-
-  -- Nvtmux plugin uses this var to display window title
-  vim.api.nvim_buf_set_var(0, 'tab_title', name)
-
-  -- Set window title
-  vim.opt.titlestring = name
-end
-
 M.get_user_sel_host = function()
   local selection = action_state.get_selected_entry()
   local host = ''
@@ -155,7 +137,7 @@ M.open_ssh_terminal = function(target)
   end
 
   if (M.config.auto_rename_buf) then
-    M.rename_tab_or_buf(host)
+    tr.set_tab_name(host)
   end
 
   vim.schedule(function()
