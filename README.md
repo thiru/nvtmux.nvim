@@ -40,6 +40,7 @@ Detailed lazy.nvim config:
       'gcmt/taboo.vim', -- For nicer tab names
       'nvim-telescope/telescope.nvim'}, -- For the SSH connection picker
     lazy = false,
+    leader = '<C-a>',
     ssh = {
       -- Auto-reconnect SSH connections
       auto_reconnect = {
@@ -86,7 +87,7 @@ nvim --cmd 'lua vim.g.nvtmux_auto_start = true'
 ```
 
 As in tmux, nvtmux uses a prefix for most of its commands so that they don't conflict with possibly
-nested vim instances. This is currently hard-coded to `<C-a>`.
+nested vim instances. By default this is set to `<C-a>`.
 
 | Keymap | Description |
 | ------ | ----------- |

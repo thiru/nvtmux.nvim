@@ -11,7 +11,7 @@ local M = {
 }
 
 function M.setup(opts)
-  local opts = opts or {}
+  opts = opts or {}
 
   vim.api.nvim_create_user_command(
     'NvtmuxStart',
@@ -26,9 +26,7 @@ function M.setup(opts)
 end
 
 function M.start(opts)
-  c.set_term_opts(opts)
-  c.setup_autocmds()
-  c.set_default_keybinds()
+  c.setup(opts)
   vim.cmd.terminal()
   vim.cmd.startinsert()
 end

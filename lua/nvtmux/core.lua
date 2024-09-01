@@ -3,6 +3,11 @@ local _ = require('nvtmux.utils')
 
 local M = {}
 
+M.config = {
+  colorscheme = nil,
+  leader = '<C-a>'
+}
+
 function M.is_terminal_buf()
   return type(vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')) == 'number'
 end
@@ -19,7 +24,14 @@ function M.num_terms_open()
   return num_terms
 end
 
-function M.set_term_opts(opts)
+function M.setup(opts)
+  M.config = vim.tbl_deep_extend('force', M.config, opts)
+  M.set_term_opts()
+  M.setup_autocmds()
+  M.set_default_keybinds()
+end
+
+function M.set_term_opts()
   vim.opt.cursorline = false
   vim.opt.scrolloff = 0
   vim.opt.number = false
@@ -27,8 +39,9 @@ function M.set_term_opts(opts)
   vim.opt.signcolumn = 'no'
   vim.opt.laststatus = 0
   vim.opt.title = true
-  if opts.colorscheme ~= nil then
-    vim.cmd.colorscheme(opts.colorscheme)
+
+  if M.config.colorscheme ~= nil then
+    vim.cmd.colorscheme(M.config.colorscheme)
   end
 end
 
@@ -133,7 +146,8 @@ function M.set_default_keybinds()
 
   -- Prefix to launch which-key
   if has_whichkey then
-    vim.keymap.set('t', '<C-a>', '<C-\\><C-N><CMD>WhichKey <C-a><CR>', {desc = 'Launch which-key with terminal-specific functions'})
+    vim.keymap.set('t', M.config.leader, '<C-\\><C-N><CMD>WhichKey ' .. M.config.leader .. '<CR>',
+      {desc = 'Launch which-key with terminal-specific functions'})
   end
 
   -- Terminal - ESC
@@ -142,13 +156,13 @@ function M.set_default_keybinds()
   -- Paste
   vim.keymap.set('t', '<C-S-v>', '<C-\\><C-n>pi', {desc = 'Paste from system clipboard'})
   if has_whichkey then
-    vim.keymap.set('n', '<C-a>p', 'pi', {desc = 'Paste from system clipboard'})
+    vim.keymap.set('n', M.config.leader .. 'p', 'pi', {desc = 'Paste from system clipboard'})
   end
 
   -- Safe quit
   vim.keymap.set('n', '<leader>q', M.safe_quit, {desc = 'Quit (confirm if multiple terms open)'})
   if has_whichkey then
-    vim.keymap.set('n', '<C-a>q', M.safe_quit, {desc = 'Quit (confirm if multiple terms open)'})
+    vim.keymap.set('n', M.config.leader .. 'q', M.safe_quit, {desc = 'Quit (confirm if multiple terms open)'})
   end
 
   -- Previous/next tab
@@ -171,13 +185,13 @@ function M.set_default_keybinds()
   -- Last accessed tab
   vim.keymap.set({'n', 't'}, '<C-`>', '<CMD>:tabnext #<CR>', {desc = 'Go to last accessed tab', silent = true})
   if has_whichkey then
-    vim.keymap.set('n', '<C-a>l', '<CMD>:tabnext #<CR>', {desc = 'Go to last accessed tab', silent = true})
+    vim.keymap.set('n', M.config.leader .. 'l', '<CMD>:tabnext #<CR>', {desc = 'Go to last accessed tab', silent = true})
   end
 
   -- New terminal tab
   vim.keymap.set({'n', 't'}, '<C-t>', M.new_tab, {desc = 'New terminal (tab)'})
   if has_whichkey then
-    vim.keymap.set('n', '<C-a>t',
+    vim.keymap.set('n', M.config.leader .. 't',
       function()
         M.new_tab()
         M.rename_tab_prompt()
@@ -199,7 +213,7 @@ function M.set_default_keybinds()
   if has_whichkey then
     vim.keymap.set(
       'n',
-      '<C-a>v',
+      M.config.leader .. 'v',
       function()
         vim.cmd.vsplit()
         vim.cmd.enew()
@@ -223,7 +237,7 @@ function M.set_default_keybinds()
   if has_whichkey then
     vim.keymap.set(
       {'n', 't'},
-      '<C-a>h',
+      M.config.leader .. 'h',
       function()
         vim.cmd.split()
         vim.cmd.enew()
@@ -236,7 +250,7 @@ function M.set_default_keybinds()
   -- Rename tab
   vim.keymap.set({'n', 't'}, '<C-S-r>', M.rename_tab_prompt, {desc = 'Rename tab'})
   if has_whichkey then
-    vim.keymap.set('n', '<C-a>r', M.rename_tab_prompt, {desc = 'Rename tab'})
+    vim.keymap.set('n', M.config.leader .. 'r', M.rename_tab_prompt, {desc = 'Rename tab'})
   end
 
   -- Move tab left/right
