@@ -31,15 +31,15 @@ Detailed lazy.nvim config:
 ```lua
 {
   'thiru/nvtmux.nvim',
+  -- See below for why cond is used
+  cond = vim.g.nvtmux_auto_start == true,
+  -- Both of these dependencies are optional:
+  depedencies = {
+    'gcmt/taboo.vim', -- For nicer tab names
+    'nvim-telescope/telescope.nvim'}, -- For the SSH connection picker
+  lazy = false,
   opts = {
     colorscheme = 'catppuccin-mocha',
-    -- See below for why cond is used
-    cond = vim.g.nvtmux_auto_start == true,
-    -- Both of these dependencies are optional:
-    depedencies = {
-      'gcmt/taboo.vim', -- For nicer tab names
-      'nvim-telescope/telescope.nvim'}, -- For the SSH connection picker
-    lazy = false,
     leader = '<C-a>',
     ssh = {
       -- Auto-reconnect SSH connections
