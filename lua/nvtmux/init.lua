@@ -26,16 +26,11 @@ function M.setup(opts)
 end
 
 function M.start(opts)
-  c.state.is_enabled = true
   c.set_term_opts(opts)
   c.setup_autocmds()
   c.set_default_keybinds()
   vim.cmd.terminal()
   vim.cmd.startinsert()
-end
-
-function M.is_enabled()
-  return c.state.is_enabled
 end
 
 return M

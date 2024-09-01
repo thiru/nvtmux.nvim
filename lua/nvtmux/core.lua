@@ -1,11 +1,7 @@
 local tr = require('nvtmux.tab-rename')
 local _ = require('nvtmux.utils')
 
-local M = {
-  state = {
-    is_enabled = false,
-  }
-}
+local M = {}
 
 function M.is_terminal_buf()
   return type(vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')) == 'number'
