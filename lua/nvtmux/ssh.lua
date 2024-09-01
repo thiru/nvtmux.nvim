@@ -3,10 +3,6 @@ local u = require('nvtmux.utils')
 
 local M = {}
 
-M.telescope = nil
-
-M.auto_reconnect_when_enum = { 'never', 'always', 'on_error' }
-
 M.config = {
   auto_rename_buf = true,
   auto_reconnect = {
@@ -14,6 +10,9 @@ M.config = {
     timeout = 3
   },
 }
+
+M.auto_reconnect_when_enum = { 'never', 'always', 'on_error' }
+M.telescope = nil
 
 M.setup = function(opts)
   M.config = vim.tbl_deep_extend('force', M.config, opts)
