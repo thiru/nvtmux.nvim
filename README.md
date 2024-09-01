@@ -37,7 +37,6 @@ Detailed lazy.nvim config:
   depedencies = {
     'gcmt/taboo.vim', -- For nicer tab names
     'nvim-telescope/telescope.nvim'}, -- For the SSH connection picker
-  lazy = false,
   opts = {
     colorscheme = 'catppuccin-mocha',
     leader = '<C-a>',
@@ -54,9 +53,6 @@ Detailed lazy.nvim config:
       -- Whether to automically rename the tab/buffer to the hostname of the SSH connection
       auto_rename_buf = true,
     },
-  },
-  keys = {
-    {'<C-a>s', '<CMD>SshPicker<CR>', desc = 'Launch [S]SH connection picker'},
   },
 }
 ```
@@ -114,6 +110,7 @@ nested vim instances. By default this is set to `<C-a>`.
 | `<C-.>` | Move current tab to the right |
 | `<leader>q` | Safe quit (confirm if multiple terminals open) |
 | `<C-a>q` | Safe quit (confirm if multiple terminals open) |
+| `<C-a>s` | Launch SSH connection picker |
 
 ### SSH Connection Picker
 

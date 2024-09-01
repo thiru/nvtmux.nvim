@@ -256,6 +256,9 @@ function M.set_default_keybinds()
   -- Move tab left/right
   vim.keymap.set({'n', 't'}, '<C-,>', function() M.move_tab('left') end, {desc = 'Move tab left'})
   vim.keymap.set({'n', 't'}, '<C-.>', function() M.move_tab('right') end, {desc = 'Move tab right'})
+
+  -- SSH picker
+  vim.keymap.set({'n', 't'}, M.config.leader .. 's', '<CMD>SshPicker<CR>', {desc = 'Launch [S]SH connection picker'})
 end
 
 return M
