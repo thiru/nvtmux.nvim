@@ -5,7 +5,7 @@ local M = {}
 
 M.config = {
   colorscheme = nil,
-  leader = '<C-a>'
+  leader = '<C-o>'
 }
 
 function M.is_terminal_buf()
