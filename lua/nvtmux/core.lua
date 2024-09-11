@@ -154,7 +154,12 @@ function M.set_default_keybinds()
   vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', {desc = 'Exit terminal mode'})
 
   -- Paste
-  vim.keymap.set('t', '<C-S-v>', '<C-\\><C-n>pi', {desc = 'Paste from system clipboard'})
+  vim.keymap.set('t', '<C-v>',
+    function ()
+      local terminal_job_id = vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')
+      vim.api.nvim_chan_send(terminal_job_id, vim.fn.getreg('+'))
+    end,
+    {desc = 'Paste from system clipboard'})
   if has_whichkey then
     vim.keymap.set('n', M.config.leader .. 'p', 'pi', {desc = 'Paste from system clipboard'})
   end

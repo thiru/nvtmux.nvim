@@ -97,7 +97,7 @@ nested vim instances. By default this is set to `<C-o>`.
 | `<C-o>h` | New terminal (horizontal split) |
 | `<C-S-r>` | Rename current tab |
 | `<C-o>r` | Rename current tab |
-| `<C-S-v>` | Paste from system clipboard |
+| `<C-v>` | Paste from system clipboard |
 | `<C-o>p` | Paste from system clipboard |
 | `<C-TAB>` | Next tab |
 | `<C-S-k>` | Next tab |
