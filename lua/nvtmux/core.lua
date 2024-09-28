@@ -5,7 +5,7 @@ local M = {}
 
 M.config = {
   colorscheme = nil,
-  leader = '<C-o>'
+  leader = '<C-a>'
 }
 
 function M.is_terminal_buf()
@@ -144,14 +144,17 @@ end
 function M.set_default_keybinds()
   local has_whichkey = pcall(function() require('which-key') end)
 
-  -- Prefix to launch which-key
   if has_whichkey then
-    vim.keymap.set('t', M.config.leader, '<C-\\><C-N><CMD>WhichKey ' .. M.config.leader .. '<CR>',
+    -- Launch which-key with terminal-specific commands
+    vim.keymap.set({'n', 't'}, '<C-space>', '<C-\\><C-N><CMD>WhichKey ' .. M.config.leader .. '<CR>',
       {desc = 'Launch which-key with terminal-specific functions'})
-  end
 
-  -- Terminal - ESC
-  vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', {desc = 'Exit terminal mode'})
+    -- Cancel which-key menu
+    vim.keymap.set('n', M.config.leader .. '<space>', '<ESC>', {desc = 'Cancel'})
+  else
+    -- Terminal - ESC
+    vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', {desc = 'Exit terminal mode'})
+  end
 
   -- Paste
   vim.keymap.set('t', '<C-v>',
