@@ -62,6 +62,15 @@ function M.setup_autocmds()
     pattern = '*',
   })
 
+  -- Avoid 'modifiable is off' message and allow terminal to be editable
+  vim.api.nvim_create_autocmd('TermOpen', {
+    callback = function()
+      vim.opt_local.modifiable = true
+    end,
+    group = vim.api.nvim_create_augroup('nvtmux_termopen', {}),
+    pattern = '*',
+  })
+
   -- Ensure we're in insert mode if we've come into another terminal buffer
   vim.api.nvim_create_autocmd('TermClose', {
     callback = function()
