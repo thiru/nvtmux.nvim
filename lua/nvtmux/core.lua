@@ -160,10 +160,10 @@ function M.set_default_keybinds()
 
     -- Cancel which-key menu
     vim.keymap.set('n', M.config.leader .. '<space>', '<ESC>', {desc = 'Cancel'})
-  else
-    -- Terminal - ESC
-    vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', {desc = 'Exit terminal mode'})
   end
+
+  -- Terminal ESC
+  vim.keymap.set('t', '<C-;>', '<C-\\><C-n>', {desc = 'Terminal mode -> normal mode'})
 
   -- Paste
   vim.keymap.set('t', '<C-v>',
