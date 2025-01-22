@@ -5,10 +5,10 @@ local M = {}
 
 M.config = {
   auto_rename_buf = true,
-  auto_reconnect = {
-    when = 'on_error',
-    timeout = 3
-  },
+}
+
+M.state = {
+  reconnects = {}
 }
 
 M.auto_reconnect_when_enum = { 'never', 'always', 'on_error' }
@@ -22,6 +22,36 @@ M.setup = function(opts)
     M.picker,
     {bang = true,
      desc = 'Open Telescope SSH picker'})
+
+  vim.api.nvim_create_autocmd('TabEnter', {
+    callback = function()
+      local bufnrs = vim.fn.tabpagebuflist()
+      for _, bufnr in ipairs(bufnrs) do
+        M.reconnect(bufnr)
+      end
+    end,
+    group = vim.api.nvim_create_augroup('nvtmux_tabenter_reconnect', {clear = true}),
+    pattern = '*',
+  })
+end
+
+M.reconnect = function(curr_bufnr)
+  local reconnect = M.state.reconnects[curr_bufnr]
+  if reconnect == nil or reconnect.exit_code == nil then
+    return
+  end
+
+  local choice = vim.fn.confirm('Reconnect to ' .. reconnect.host .. '?', '&Yes\n&No')
+  if choice == 2 then
+    return
+  end
+
+  local curr_tabnr = u.getTabNumberForBuffer(curr_bufnr)
+  local msg = 'Reconnect # ' .. (reconnect.count + 1) .. ' to ' .. reconnect.host .. ' in tab ' .. curr_tabnr
+  vim.notify(msg, vim.log.levels.INFO)
+
+  M.open_ssh_terminal(reconnect.target, curr_bufnr)
+  M.state.reconnects[curr_bufnr].exit_code = nil
 end
 
 M.load_telescope = function()
@@ -100,46 +130,65 @@ M.get_user_sel_host = function()
   return host
 end
 
-M.open_ssh_terminal = function(target)
+M.open_ssh_terminal = function(target, old_bufnr)
+  local curr_bufnr = nil
   local host = M.get_user_sel_host()
-
   local cmd = 'ssh "' .. host .. '"'
-  if M.config.auto_reconnect.when == 'always' then
-    cmd = [[sh -c "while true; ]] ..
-          [[ssh ']] .. host .. [[' || true; ]] ..
-          [[do echo '[nvtmux] Auto-reconnect in ]] ..
-          M.config.auto_reconnect.timeout .. [[ second(s)... Press CTRL-C to cancel.'; ]] ..
-          [[sleep ]] .. M.config.auto_reconnect.timeout .. [[; done"]]
-  elseif M.config.auto_reconnect.when == 'on_error' then
-    cmd = [[sh -c "while ! ssh ']] .. host .. [['; ]] ..
-          [[do echo '[nvtmux] Auto-reconnect in ]] ..
-          M.config.auto_reconnect.timeout .. [[ second(s)... Press CTRL-C to cancel.'; ]] ..
-          [[sleep ]] .. M.config.auto_reconnect.timeout .. [[; done"]]
-  else
-    error('Invalid value for auto-reconnect.when: ' .. M.config.auto_reconnect.when ..
-          '. Must be one of: ' .. vim.inspect(M.auto_reconnect_when_enum))
-  end
-  vim.notify('[nvtmux] ' .. cmd, vim.log.levels.DEBUG)
 
-  -- Open in current buffer
+  -- Open in the current buffer
   if target == 'this' then
-    local terminal_job_id = vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')
-    -- Use existing terminal if one is already running
-    if type(terminal_job_id) == 'number' then
-      vim.api.nvim_chan_send(terminal_job_id, cmd .. '\r')
+    if old_bufnr == nil then
+      local choice = vim.fn.confirm('Replace the current buffer and connect to ' .. host .. '?', '&No\n&Yes')
+      if choice == 1 then
+        vim.schedule(function()
+          vim.cmd.startinsert()
+        end)
+        return
+      end
+      curr_bufnr = vim.api.nvim_get_current_buf()
     else
-      vim.fn.termopen(cmd)
+      curr_bufnr = old_bufnr
     end
-  -- Open in new tab
+  -- Open in a new tab
   elseif target == 'tab' then
-    vim.cmd.tabnew()
-    vim.fn.termopen(cmd)
-  -- Open in a split
+    if old_bufnr == nil then
+      vim.cmd.tabnew()
+      curr_bufnr = vim.api.nvim_get_current_buf()
+    else
+      curr_bufnr = old_bufnr
+    end
+  -- Open in a new split
   else
+    -- HACK: seem to have to delete the buffer if it's in a split otherwise termopen
+    -- fails with the notorious modified buffer error
+    if old_bufnr ~= nil then
+      vim.cmd('bdelete! ' .. old_bufnr)
+    end
+
     vim.cmd(target)
     vim.cmd.enew()
-    vim.fn.termopen(cmd)
+    curr_bufnr = vim.api.nvim_get_current_buf()
   end
+
+  -- Need this to overwrite existing, modified buffer with a new terminal session
+  vim.api.nvim_set_option_value('modified', false, {buf=curr_bufnr})
+
+  vim.fn.termopen(
+    cmd,
+    {
+      on_exit = function(_, exit_code, _)
+        if M.state.reconnects[curr_bufnr] == nil then
+          M.state.reconnects[curr_bufnr] = {bufnr = curr_bufnr, exit_code = exit_code, count = 0, target = target, host = host}
+        else
+          M.state.reconnects[curr_bufnr].count = M.state.reconnects[curr_bufnr].count + 1
+          M.state.reconnects[curr_bufnr].exit_code = exit_code
+        end
+
+        if u.getTabNumberForBuffer(curr_bufnr) == vim.fn.tabpagenr() then
+          M.reconnect(curr_bufnr)
+        end
+      end
+    })
 
   if (M.config.auto_rename_buf) then
     tr.set_tab_name(host)

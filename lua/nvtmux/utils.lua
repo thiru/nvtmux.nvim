@@ -16,6 +16,18 @@ function M.num_terms_open()
   return num_terms
 end
 
+function M.getTabNumberForBuffer(bufnr)
+  for t = 1, vim.fn.tabpagenr('$') do
+    local buflist = vim.fn.tabpagebuflist(t)
+    for _, buf in ipairs(buflist) do
+      if buf == bufnr then
+        return t
+      end
+    end
+  end
+  return -1  -- buffer not found in any tabs
+end
+
 function M.sort_alpha_before_number(a, b)
   local a_is_alphabetic = string.match(a, "%a.*")
   local b_is_alphabetic = string.match(b, "%a.*")
