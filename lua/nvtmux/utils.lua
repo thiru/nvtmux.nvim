@@ -1,8 +1,19 @@
 local M = {}
 
-function M.pp(...)
-  local objects = vim.tbl_map(vim.inspect, { ... })
-  print(unpack(objects))
+function M.is_terminal_buf()
+  return type(vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')) == 'number'
+end
+
+function M.num_terms_open()
+  local num_terms = 0
+
+  for _, v in pairs(vim.fn.getbufinfo({buflisted = 1})) do
+    if type(v.variables.terminal_job_id) == 'number' then
+      num_terms = num_terms + 1
+    end
+  end
+
+  return num_terms
 end
 
 function M.sort_alpha_before_number(a, b)

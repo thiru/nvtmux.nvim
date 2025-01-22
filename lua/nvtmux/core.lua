@@ -1,5 +1,5 @@
 local tr = require('nvtmux.tab-rename')
-local _ = require('nvtmux.utils')
+local u = require('nvtmux.utils')
 
 local M = {}
 
@@ -7,22 +7,6 @@ M.config = {
   colorscheme = nil,
   leader = '<C-a>'
 }
-
-function M.is_terminal_buf()
-  return type(vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')) == 'number'
-end
-
-function M.num_terms_open()
-  local num_terms = 0
-
-  for _, v in pairs(vim.fn.getbufinfo({buflisted = 1})) do
-    if type(v.variables.terminal_job_id) == 'number' then
-      num_terms = num_terms + 1
-    end
-  end
-
-  return num_terms
-end
 
 function M.setup(opts)
   M.config = vim.tbl_deep_extend('force', M.config, opts)
@@ -53,7 +37,7 @@ function M.setup_autocmds()
 
       -- When switching tabs ensure we're in terminal insert mode
       vim.schedule(function ()
-        if M.is_terminal_buf() and vim.fn.mode() ~= 't' then
+        if u.is_terminal_buf() and vim.fn.mode() ~= 't' then
           vim.cmd.startinsert()
         end
       end)
@@ -75,7 +59,7 @@ function M.setup_autocmds()
   vim.api.nvim_create_autocmd('TermClose', {
     callback = function()
       -- HACK: Not sure why I need to set `startinsert` in a timeout. It doesn't seem to work otherwise.
-      if M.is_terminal_buf() then
+      if u.is_terminal_buf() then
         local timer = vim.uv.new_timer()
         timer:start(10, 0, function()
           timer:stop()
@@ -94,7 +78,7 @@ function M.setup_autocmds()
   vim.api.nvim_create_autocmd('TermLeave', {
     callback = function()
       vim.schedule(function()
-        if M.num_terms_open() == 0 then
+        if u.num_terms_open() == 0 then
           vim.cmd.quit()
         end
       end)
@@ -122,7 +106,7 @@ end
 
 function M.safe_quit()
   vim.schedule(function()
-    if M.num_terms_open() > 1 then
+    if u.num_terms_open() > 1 then
       local choice = vim.fn.confirm('Quit even though terminals are open?', '&Cancel\n&Quit')
       if choice == 2 then
         vim.cmd('qall!')
