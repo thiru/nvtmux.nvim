@@ -21,6 +21,7 @@ Minimal lazy.nvim config:
 ```lua
 {
   'thiru/nvtmux.nvim',
+  depedencies = { 'MunifTanjim/nui.nvim' }
 }
 ```
 
@@ -33,10 +34,10 @@ Detailed lazy.nvim config:
   'thiru/nvtmux.nvim',
   -- See below for why cond is used
   cond = vim.g.nvtmux_auto_start == true,
-  -- Both of these dependencies are optional:
   depedencies = {
-    'gcmt/taboo.vim', -- For nicer tab names
-    'nvim-telescope/telescope.nvim'}, -- For the SSH connection picker
+    'MunifTanjim/nui.nvim',
+    'gcmt/taboo.vim', -- For nicer tab names (optional)
+    'nvim-telescope/telescope.nvim'}, -- For the SSH connection picker (optional)
   opts = {
     colorscheme = 'catppuccin-mocha',
     leader = '<C-a>',
