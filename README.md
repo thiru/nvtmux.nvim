@@ -41,15 +41,8 @@ Detailed lazy.nvim config:
     colorscheme = 'catppuccin-mocha',
     leader = '<C-a>',
     ssh = {
-      -- Auto-reconnect SSH connections
-      auto_reconnect = {
-        -- Specifies when automatic reconnect happens
-        -- The default is 'on_error' (when the ssh command returns a non-zero exit code)
-        -- Other possible values are 'always', 'never'
-        when = 'on_error',
-        -- The amount of time (in seconds) to sleep between reconnects
-        timeout = 3
-      },
+      -- Auto-reconnect SSH connections (on prompt)
+      auto_reconnect = true,
       -- Whether to automically rename the tab/buffer to the hostname of the SSH connection
       auto_rename_buf = true,
     },
