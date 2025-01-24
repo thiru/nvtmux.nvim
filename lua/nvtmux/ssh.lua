@@ -106,7 +106,7 @@ M.open_ssh_terminal = function(target)
   if not M.config.auto_reconnect then
     cmd = ssh_cmd_simple
   else
-    local confirm_msg = "'Press any key to reconnect or CTRL-C to cancel '"
+    local confirm_msg = "'Press any key to reconnect to " .. host .. " (CTRL-C to cancel) '"
     cmd = ' bash -c "' .. ssh_cmd_nested .. ' && while read -n 1 -p ' .. confirm_msg .. ' yn && echo; do ' .. ssh_cmd_nested .. '; done"'
   end
 
