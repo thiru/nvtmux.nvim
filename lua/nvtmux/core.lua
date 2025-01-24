@@ -94,7 +94,8 @@ function M.new_tab()
 end
 
 function M.rename_tab_prompt()
-  local new_name = vim.fn.input('Tab Name')
+  local curr_name = u.get_tab_name()
+  local new_name = vim.fn.input('Tab Name', curr_name)
 
   if #new_name > 0 then
     u.set_tab_name(new_name)

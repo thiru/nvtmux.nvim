@@ -41,6 +41,16 @@ function M.sort_alpha_before_number(a, b)
   return a < b
 end
 
+function M.get_tab_name()
+  local found, tab_name = pcall(function() return vim.api.nvim_buf_get_var(0, 'tab_title') end)
+
+  if found then
+    return tab_name
+  else
+    return ''
+  end
+end
+
 function M.set_tab_name(name)
   if vim.g.loaded_taboo == 1 then
     vim.cmd('TabooRename ' .. name)
