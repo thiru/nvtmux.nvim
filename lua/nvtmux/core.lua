@@ -1,4 +1,3 @@
-local tr = require('nvtmux.tab-rename')
 local u = require('nvtmux.utils')
 
 local M = {}
@@ -95,13 +94,11 @@ function M.new_tab()
 end
 
 function M.rename_tab_prompt()
-  tr.state.last_bufnr = vim.api.nvim_get_current_buf()
-  local input = tr.state.nui_input or tr.create_nui_input()
+  local new_name = vim.fn.input('Tab Name')
 
-  input:mount()
-  vim.schedule(function()
-    vim.cmd.startinsert()
-  end)
+  if #new_name > 0 then
+    u.set_tab_name(new_name)
+  end
 end
 
 function M.safe_quit()

@@ -41,4 +41,17 @@ function M.sort_alpha_before_number(a, b)
   return a < b
 end
 
+function M.set_tab_name(name)
+  if vim.g.loaded_taboo == 1 then
+    vim.cmd('TabooRename ' .. name)
+  else
+    -- Surrounding tab name with spaces to avoid collision with files paths in cwd
+    local safe_name = ' ' .. name .. ' '
+    vim.api.nvim_buf_set_name(0, safe_name)
+  end
+
+  vim.api.nvim_buf_set_var(0, 'tab_title', name)
+  vim.opt.titlestring = name
+end
+
 return M
