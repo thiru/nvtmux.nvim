@@ -81,7 +81,8 @@ nested vim instances. By default this is set to `<C-a>`.
 
 | Keymap      | Description                                    |
 |-------------|------------------------------------------------|
-| `<C-space>` | Escape terminal mode                           |
+| `<C-;>`     | Escape terminal mode                           |
+| `<C-space>` | Launch which-key with terminal-specific cmds   |
 | `<C-t>`     | New terminal (tab)                             |
 | `<C-a>t`    | New terminal (tab)                             |
 | `<C-S-t>`   | New terminal (vertical split)                  |
@@ -97,7 +98,7 @@ nested vim instances. By default this is set to `<C-a>`.
 | `<C-S-k>`   | Next tab                                       |
 | `<C-S-TAB>` | Previous tab                                   |
 | `<C-S-j>`   | Previous tab                                   |
-| `<C-[NUM]>` | Go to the tab at the specified index           |
+| `<C-[NUM]>` | Go to the specified numbered tab               |
 | `<C-tilde>` | Go to last accessed tab                        |
 | `<C-a>l`    | Go to last accessed tab                        |
 | `<C-,>`     | Move current tab to the left                   |
