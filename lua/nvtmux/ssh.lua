@@ -112,8 +112,8 @@ M.open_ssh_terminal = function(target)
 
   -- Open in the current buffer
   if target == 'this' then
-    local choice = vim.fn.confirm('Replace the current buffer and connect to ' .. host .. '?', '&No\n&Yes')
-    if choice == 1 then
+    local confirm = vim.fn.input('Wipe out the current buffer and connect to ' .. host .. '?', 'yes')
+    if vim.trim(confirm) ~= 'yes' then
       vim.schedule(function()
         vim.cmd.startinsert()
       end)
