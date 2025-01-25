@@ -1,4 +1,5 @@
 local u = require('nvtmux.utils')
+local tabs = require('nvtmux.tabs')
 
 local M = {}
 
@@ -10,6 +11,7 @@ M.config = {
 function M.setup(opts)
   M.config = vim.tbl_deep_extend('force', M.config, opts)
   M.set_term_opts()
+  tabs.init()
   M.setup_autocmds()
   M.set_default_keybinds()
 end
@@ -32,7 +34,7 @@ function M.setup_autocmds()
   vim.api.nvim_create_autocmd('TabEnter', {
     callback = function ()
       -- Update window title
-      vim.opt.titlestring = vim.fn.getbufvar('%', 'tab_title') .. ''
+      vim.opt.titlestring = tabs.get_tab_name()
 
       -- When switching tabs ensure we're in terminal insert mode
       vim.schedule(function ()
@@ -94,11 +96,11 @@ function M.new_tab()
 end
 
 function M.rename_tab_prompt()
-  local curr_name = u.get_tab_name()
+  local curr_name = tabs.get_tab_name()
   local new_name = vim.fn.input('Tab Name', curr_name)
 
   if #new_name > 0 then
-    u.set_tab_name(new_name)
+    tabs.set_tab_name(new_name)
   end
 end
 
@@ -175,9 +177,7 @@ function M.set_default_keybinds()
     vim.keymap.set(
       {'i', 'n', 't', 'v'},
       '<C-' .. i .. '>',
-      function()
-        M.go_to_tab(i)
-      end,
+      function() M.go_to_tab(i) end,
       {desc = 'Go to tab by index', silent=true})
   end
 

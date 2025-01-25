@@ -34,7 +34,6 @@ Detailed lazy.nvim config:
   -- See below for why cond is used
   cond = vim.g.nvtmux_auto_start == true,
   depedencies = {
-    'gcmt/taboo.vim', -- For nicer tab names (optional)
     'nvim-telescope/telescope.nvim'}, -- For the SSH connection picker (optional)
   opts = {
     colorscheme = 'catppuccin-mocha',
@@ -46,19 +45,6 @@ Detailed lazy.nvim config:
       auto_rename_buf = true,
     },
   },
-}
-```
-
-If you are making use of tabs and have [taboo.vim](https://github.com/gcmt/taboo.vim), it will be
-used to set the tab name to the SSH host. I personally use the following config for taboo:
-
-```lua
-{
-  'gcmt/taboo.vim',
-  config = function()
-    vim.g.taboo_tab_format = ' %I %f '
-    vim.g.taboo_renamed_tab_format = ' %I %l '
-  end
 }
 ```
 

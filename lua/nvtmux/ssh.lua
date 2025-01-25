@@ -1,4 +1,5 @@
 local u = require('nvtmux.utils')
+local tabs = require('nvtmux.tabs')
 
 local M = {}
 
@@ -134,7 +135,7 @@ M.open_ssh_terminal = function(target)
   vim.fn.termopen(cmd)
 
   if (M.config.auto_rename_buf) then
-    u.set_tab_name(host)
+    tabs.set_tab_name(host)
   end
 
   vim.schedule(function()
