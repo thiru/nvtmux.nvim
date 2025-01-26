@@ -106,9 +106,8 @@ To start the Telescope SSH connection picker use the keymap defined above or run
 ```
 
 All actions will start an instance of Neovim's terminal emulator. The default action (`<CR>`)
-will use the current buffer, so it must be unmodified otherwise an error will occur.
-
-You can also use Telescope's alternative actions to open the SSH connection in a new:
+will use the current buffer. You can also use Telescope's alternative actions to open the SSH
+connection in a new:
 
 - tab (`<C-t>`)
 - horizontal split (`<C-x>`)
