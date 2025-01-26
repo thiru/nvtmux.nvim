@@ -21,6 +21,15 @@ function M.setup(opts)
     {bang = true,
      desc = 'Start nvtmux mode'})
 
+  vim.api.nvim_create_user_command(
+    'NvtmuxSshPwdReinject',
+    function(fopts)
+      ssh.ssh_pwd_reinject(fopts.args)
+    end,
+    {bang = true,
+     nargs = 1,
+     desc = 'Request SSH password injection from cache'})
+
   M.start(opts)
   ssh.setup(opts.ssh)
 end

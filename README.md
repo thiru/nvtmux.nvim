@@ -43,8 +43,8 @@ Detailed lazy.nvim config:
       auto_reconnect = true,
       -- Whether to automically rename the tab/buffer to the hostname of the SSH connection
       auto_rename_buf = true,
-      -- Keybind to inject cached SSH password
-      password_paste_key = '<C-S-p>',
+      -- Whether to cache passwords/passphrases when prompted
+      cache_passwords = true,
       -- Lua patterns used to detect an SSH password prompt
       password_detect_patterns = {
         'password:$',

@@ -5,13 +5,14 @@ local M = {
   config = {
     auto_reconnect = true,
     auto_rename_buf = true,
-    password_paste_key = '<C-S-p>',
+    cache_passwords = true,
     password_detect_patterns = {
       'password:$',
-      '^Enter passphrase for key'},
+      '^Enter passphrase for key.*:$'},
     password_detect_max_lines = 50
   },
   state = {
+    ssh_cache = {},
     telescope = nil
   }
 }
@@ -102,17 +103,17 @@ M.get_user_sel_host = function()
   return host
 end
 
+M.ssh_pwd_reinject = function(bufnr)
+  vim.schedule(function ()
+    local ssh_cache = M.state.ssh_cache[tonumber(bufnr)]
+    ssh_cache.reinject = true
+    ssh_cache.stdout_line_count = 0
+  end)
+end
+
 M.open_ssh_terminal = function(target)
   local host = M.get_user_sel_host()
   local cmd = nil
-
-  if not M.config.auto_reconnect then
-    cmd = 'ssh "' .. host .. '"'
-  else
-    local ssh_cmd_nested = "(ssh '" .. host .. "' || true)"
-    local confirm_msg = "'Press any key to reconnect to " .. host .. " (CTRL-C to cancel) '"
-    cmd = ' bash -c "' .. ssh_cmd_nested .. ' && while read -n 1 -p ' .. confirm_msg .. ' yn && echo; do ' .. ssh_cmd_nested .. '; done"'
-  end
 
   -- Open in the current buffer
   if target == 'this' then
@@ -135,45 +136,68 @@ M.open_ssh_terminal = function(target)
     vim.cmd.enew()
   end
 
-  -- Potentially cached SSH password
-  local pwd = ''
+  local bufnr = vim.api.nvim_get_current_buf()
 
-  -- Count stdout lines processed so we don't keep trying to detect an SSH password prompt for too long
-  local stdout_line_count = 0
+  if not M.config.auto_reconnect then
+    cmd = 'ssh "' .. host .. '"'
+  else
+    local ssh_cmd_nested = "(ssh '" .. host .. "' || true)"
+    local confirm_msg = "'Press any key to reconnect to " .. host .. " (CTRL-C to cancel) '"
+    cmd = ' bash -c "' .. ssh_cmd_nested ..
+          ' && while read -n 1 -p ' .. confirm_msg .. ' yn && echo ' ..
+          (M.config.cache_passwords and ' && nvim --server ' .. vim.v.servername  .. ' --remote-expr \'execute(\\"NvtmuxSshPwdReinject ' .. bufnr .. '\\")\'' or '') ..
+          ' ;do ' .. ssh_cmd_nested .. '; done"'
+  end
 
   vim.notify('Connecting to ' .. host, vim.log.levels.INFO)
-  vim.fn.termopen(
-    cmd,
-    {
-      on_stdout = function(chan_id, data, _)
-        if #pwd > 0 then
-          return
-        end
-        for _, line in ipairs(data) do
-          line = vim.trim(line)
-          stdout_line_count = stdout_line_count + 1
-          if stdout_line_count > M.config.password_detect_max_lines then
+
+  if M.config.cache_passwords then
+    M.state.ssh_cache[bufnr] = {
+      pwd = '',
+      reinject = false,
+      -- Count stdout lines processed so we don't keep trying to detect an SSH password prompt for too long
+      stdout_line_count = 0}
+    local ssh_cache = M.state.ssh_cache[bufnr]
+
+    vim.fn.termopen(
+      cmd,
+      {
+        on_stdout = function(chan_id, data, _)
+          if not M.config.cache_passwords then
             return
           end
-          for _, pattern in ipairs(M.config.password_detect_patterns) do
-            if (line:find(pattern)) then
-              vim.schedule(function()
-                local msg = 'Enter password here to cache (reuse with ' .. M.config.password_paste_key .. '):'
-                pwd = (vim.fn.inputsecret(msg) or '')
-                if #pwd > 0 then
-                  vim.fn.chansend(chan_id, pwd .. '\n')
-                  vim.keymap.set(
-                    't',
-                    M.config.password_paste_key,
-                    function() vim.fn.chansend(chan_id, pwd .. '\n') end,
-                    {buffer = 0})
+
+          if ssh_cache.reinject or (#ssh_cache.pwd == 0) then
+            for _, line in ipairs(data) do
+              line = vim.trim(line)
+              ssh_cache.stdout_line_count = ssh_cache.stdout_line_count + 1
+              if ssh_cache.stdout_line_count > M.config.password_detect_max_lines then
+                return
+              end
+              for _, pattern in ipairs(M.config.password_detect_patterns) do
+                if (line:find(pattern)) then
+                  if #ssh_cache.pwd == 0 then
+                    vim.schedule(function()
+                      local msg = 'Enter password here to cache:'
+                      ssh_cache.pwd = (vim.fn.inputsecret(msg) or '')
+                      if #ssh_cache.pwd > 0 then
+                        vim.fn.chansend(chan_id, ssh_cache.pwd .. '\n')
+                      end
+                    end)
+                  end
+                  if ssh_cache.reinject then
+                    ssh_cache.reinject = false
+                    vim.fn.chansend(chan_id, ssh_cache.pwd .. '\n')
+                  end
+                  break
                 end
-              end)
-              break
+              end
             end
           end
-        end
-      end})
+        end})
+  else
+    vim.fn.termopen(cmd)
+  end
 
   if (M.config.auto_rename_buf) then
     tabs.set_tab_name(host)
