@@ -6,6 +6,11 @@ local M = {}
 M.config = {
   auto_reconnect = true,
   auto_rename_buf = true,
+  password_paste_key = '<C-S-p>',
+  password_detect_patterns = {
+    'password:$',
+    '^Enter passphrase for key'},
+  password_detect_max_lines = 50
 }
 
 M.auto_reconnect_when_enum = { 'never', 'always', 'on_error' }
@@ -130,8 +135,45 @@ M.open_ssh_terminal = function(target)
     vim.cmd.enew()
   end
 
+  -- Potentially cached SSH password
+  local pwd = ''
+
+  -- Count stdout lines processed so we don't keep trying to detect an SSH password prompt for too long
+  local stdout_line_count = 0
+
   vim.notify('Connecting to ' .. host, vim.log.levels.INFO)
-  vim.fn.termopen(cmd)
+  vim.fn.termopen(
+    cmd,
+    {
+      on_stdout = function(chan_id, data, _)
+        if #pwd > 0 then
+          return
+        end
+        for _, line in ipairs(data) do
+          line = vim.trim(line)
+          stdout_line_count = stdout_line_count + 1
+          if stdout_line_count > M.config.password_detect_max_lines then
+            return
+          end
+          for _, pattern in ipairs(M.config.password_detect_patterns) do
+            if (line:find(pattern)) then
+              vim.schedule(function()
+                local msg = 'Enter password here to cache (reuse with ' .. M.config.password_paste_key .. '):'
+                pwd = (vim.fn.inputsecret(msg) or '')
+                if #pwd > 0 then
+                  vim.fn.chansend(chan_id, pwd .. '\n')
+                  vim.keymap.set(
+                    't',
+                    M.config.password_paste_key,
+                    function() vim.fn.chansend(chan_id, pwd .. '\n') end,
+                    {buffer = 0})
+                end
+              end)
+              break
+            end
+          end
+        end
+      end})
 
   if (M.config.auto_rename_buf) then
     tabs.set_tab_name(host)
