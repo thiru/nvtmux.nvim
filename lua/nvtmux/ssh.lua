@@ -99,13 +99,12 @@ end
 
 M.open_ssh_terminal = function(target)
   local host = M.get_user_sel_host()
-  local ssh_cmd_simple = 'ssh "' .. host .. '"'
-  local ssh_cmd_nested = "(ssh '" .. host .. "' || true)"
   local cmd = nil
 
   if not M.config.auto_reconnect then
-    cmd = ssh_cmd_simple
+    cmd = 'ssh "' .. host .. '"'
   else
+    local ssh_cmd_nested = "(ssh '" .. host .. "' || true)"
     local confirm_msg = "'Press any key to reconnect to " .. host .. " (CTRL-C to cancel) '"
     cmd = ' bash -c "' .. ssh_cmd_nested .. ' && while read -n 1 -p ' .. confirm_msg .. ' yn && echo; do ' .. ssh_cmd_nested .. '; done"'
   end
@@ -131,7 +130,7 @@ M.open_ssh_terminal = function(target)
     vim.cmd.enew()
   end
 
-  vim.notify(ssh_cmd_simple, vim.log.levels.INFO)
+  vim.notify('Connecting to ' .. host, vim.log.levels.INFO)
   vim.fn.termopen(cmd)
 
   if (M.config.auto_rename_buf) then
