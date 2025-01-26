@@ -1,20 +1,20 @@
 local u = require('nvtmux.utils')
 local tabs = require('nvtmux.tabs')
 
-local M = {}
-
-M.config = {
-  auto_reconnect = true,
-  auto_rename_buf = true,
-  password_paste_key = '<C-S-p>',
-  password_detect_patterns = {
-    'password:$',
-    '^Enter passphrase for key'},
-  password_detect_max_lines = 50
+local M = {
+  config = {
+    auto_reconnect = true,
+    auto_rename_buf = true,
+    password_paste_key = '<C-S-p>',
+    password_detect_patterns = {
+      'password:$',
+      '^Enter passphrase for key'},
+    password_detect_max_lines = 50
+  },
+  state = {
+    telescope = nil
+  }
 }
-
-M.auto_reconnect_when_enum = { 'never', 'always', 'on_error' }
-M.telescope = nil
 
 M.setup = function(opts)
   M.config = vim.tbl_deep_extend('force', M.config, opts)
@@ -27,7 +27,7 @@ M.setup = function(opts)
 end
 
 M.load_telescope = function()
-  M.telescope = {
+  M.state.telescope = {
     loaded = true,
     action_state = require('telescope.actions.state'),
     actions = require('telescope.actions'),
@@ -90,11 +90,11 @@ M.parse_hosts = function()
 end
 
 M.get_user_sel_host = function()
-  local selection = M.telescope.action_state.get_selected_entry()
+  local selection = M.state.telescope.action_state.get_selected_entry()
   local host = ''
 
   if selection == nil then
-    host = M.telescope.action_state.get_current_line()
+    host = M.state.telescope.action_state.get_current_line()
   else
     host = selection[1]
   end
@@ -187,38 +187,38 @@ end
 M.picker = function(opts)
   opts = opts or {}
 
-  if M.telescope == nil and (not pcall(M.load_telescope)) then
+  if M.state.telescope == nil and (not pcall(M.load_telescope)) then
     error("Telescope is required for nvtmux's SSH picker")
   end
 
-  M.telescope.pickers.new(opts, {
+  M.state.telescope.pickers.new(opts, {
     prompt_title = 'SSH Picker',
-    finder = M.telescope.finders.new_table({
+    finder = M.state.telescope.finders.new_table({
       results = M.parse_hosts()
     }),
-    sorter = M.telescope.conf.generic_sorter(opts),
+    sorter = M.state.telescope.conf.generic_sorter(opts),
     attach_mappings = function(prompt_bufnr, _)
       -- Open in the current buffer
-      M.telescope.actions.select_default:replace(function()
-        M.telescope.actions.close(prompt_bufnr)
+      M.state.telescope.actions.select_default:replace(function()
+        M.state.telescope.actions.close(prompt_bufnr)
         M.open_ssh_terminal('this')
       end)
 
       -- Open in a new tab
-      M.telescope.actions.select_tab:replace(function()
-        M.telescope.actions.close(prompt_bufnr)
+      M.state.telescope.actions.select_tab:replace(function()
+        M.state.telescope.actions.close(prompt_bufnr)
         M.open_ssh_terminal('tab')
       end)
 
       -- Open in a horizontal split
-      M.telescope.actions.select_horizontal:replace(function()
-        M.telescope.actions.close(prompt_bufnr)
+      M.state.telescope.actions.select_horizontal:replace(function()
+        M.state.telescope.actions.close(prompt_bufnr)
         M.open_ssh_terminal('split')
       end)
 
       -- Open in a vertical split
-      M.telescope.actions.select_vertical:replace(function()
-        M.telescope.actions.close(prompt_bufnr)
+      M.state.telescope.actions.select_vertical:replace(function()
+        M.state.telescope.actions.close(prompt_bufnr)
         M.open_ssh_terminal('vsplit')
       end)
       return true
