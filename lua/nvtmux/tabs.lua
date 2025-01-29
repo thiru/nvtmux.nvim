@@ -42,8 +42,6 @@ function M.get_tab_name(tab)
 end
 
 function M.set_tab_name(name)
-  -- Surrounding tab name with spaces to avoid collision with files paths in cwd
-  vim.api.nvim_buf_set_name(0, ' ' .. name .. ' ')
   vim.api.nvim_tabpage_set_var(0, 'tabname', name)
   vim.opt.titlestring = name
   vim.cmd('redraw!')
