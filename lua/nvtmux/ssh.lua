@@ -142,12 +142,15 @@ M.open_ssh_terminal = function(target)
     cmd = 'ssh "' .. host .. '"'
   else
     local ssh_cmd_nested = "(ssh '" .. host .. "' || true)"
-    local confirm_msg = "'Press any key to reconnect to " .. host .. " (CTRL-C to cancel) '"
+    local confirm_msg = "'Press ENTER to reconnect to " .. host .. " (CTRL-C to cancel) '"
     local nvim_server_name = vim.v.servername:gsub('\\', '\\\\')
-    cmd = ' bash -c "' .. ssh_cmd_nested ..
-          ' && while read -n 1 -p ' .. confirm_msg .. ' yn && echo ' ..
-          (M.config.cache_passwords and " && nvim --server '" .. nvim_server_name  .. '\' --remote-expr \'execute(\\"NvtmuxSshPwdReinject ' .. bufnr .. '\\")\'' or '') ..
-          ' ;do ' .. ssh_cmd_nested .. '; done"'
+    cmd = ' sh -c "' ..
+          'while true;' ..
+          ' do ' .. ssh_cmd_nested .. ';' ..
+          ' printf ' .. confirm_msg .. ';' ..
+          ' read -r dummy </dev/tty;' ..
+          (M.config.cache_passwords and " nvim --server '" .. nvim_server_name  .. '\' --remote-expr \'execute(\\"NvtmuxSshPwdReinject ' .. bufnr .. '\\")\';' or '') ..
+          ' done"'
   end
 
   vim.notify('Connecting to ' .. host, vim.log.levels.INFO)
