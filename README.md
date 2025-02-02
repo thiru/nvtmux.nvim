@@ -20,7 +20,8 @@ Minimal lazy.nvim config:
 
 ```lua
 {
-  'thiru/nvtmux.nvim'
+  'thiru/nvtmux.nvim',
+  cond = vim.g.nvtmux_auto_start == true,
 }
 ```
 
@@ -31,20 +32,31 @@ Detailed lazy.nvim config:
 ```lua
 {
   'thiru/nvtmux.nvim',
+
   -- See below for why cond is used
   cond = vim.g.nvtmux_auto_start == true,
-  depedencies = {
-    'nvim-telescope/telescope.nvim'}, -- For the SSH connection picker (optional)
+
+  depedencies = {'nvim-telescope/telescope.nvim'}, -- For the SSH connection picker (optional)
+
   opts = {
+    -- Optionally specify a custom colour scheme when using this plugin
     colorscheme = 'catppuccin-mocha',
+
+    -- The leader key is used for many key binds to avoid conflicting with nested vim instances
+    -- I believe tmux follows a similar approach
     leader = '<C-space>',
+
+    -- SSH picker options
     ssh = {
-      -- Auto-reconnect SSH connections (on prompt)
+      -- Automatically reconnect disconnected sessions (on prompt only)
       auto_reconnect = true,
-      -- Whether to automically rename the current tab to the hostname of the SSH connection
+
+      -- Automatically rename the current tab to the hostname of the SSH connection
       auto_rename_tab = true,
-      -- Whether to cache passwords/passphrases when prompted
+
+      -- Cache passwords/passphrases when prompted
       cache_passwords = true,
+
       -- Lua patterns used to detect an SSH password prompt
       password_detect_patterns = {
         'password:$',
@@ -56,11 +68,11 @@ Detailed lazy.nvim config:
 
 ## Usage
 
-You probably don't always want to start this plugin since it alters the appears and behaviour of
-Neovim to behave as a terminal multiplexor. This is the purpose of the `cond` expression in the
-Lazy config above.
+You likely don't want this plugin to start every time you run Neovim as it alters the appearance
+and behaviour considerably in order to behave as a terminal multiplexor. This is the purpose of the
+`cond` expression in the Lazy config above.
 
-I would recommend creating an alias or shortcut in your OS to start Neovim like so:
+I would recommend creating an alias or shortcut in your OS to start Neovim with Nvtmux like so:
 
 ```shell
 nvim --cmd 'lua vim.g.nvtmux_auto_start = true'
