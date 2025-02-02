@@ -37,7 +37,7 @@ Detailed lazy.nvim config:
     'nvim-telescope/telescope.nvim'}, -- For the SSH connection picker (optional)
   opts = {
     colorscheme = 'catppuccin-mocha',
-    leader = '<C-a>',
+    leader = '<C-space>',
     ssh = {
       -- Auto-reconnect SSH connections (on prompt)
       auto_reconnect = true,
@@ -66,36 +66,38 @@ I would recommend creating an alias or shortcut in your OS to start Neovim like 
 nvim --cmd 'lua vim.g.nvtmux_auto_start = true'
 ```
 
-As in tmux, nvtmux uses a prefix for most of its commands so that they don't conflict with possibly
-nested vim instances. By default this is set to `<C-a>`.
+As in tmux, nvtmux uses a prefix for many of its commands so that they don't conflict with possibly
+nested vim instances. By default this is set to `<C-space>`.
 
-| Keymap      | Description                                    |
-|-------------|------------------------------------------------|
-| `<C-;>`     | Escape terminal mode                           |
-| `<C-space>` | Launch which-key with terminal-specific cmds   |
-| `<C-t>`     | New terminal (tab)                             |
-| `<C-a>t`    | New terminal (tab)                             |
-| `<C-S-t>`   | New terminal (vertical split)                  |
-| `<C-a>v`    | New terminal (vertical split)                  |
-| `<C-S-h>`   | New terminal (horizontal split)                |
-| `<C-a>h`    | New terminal (horizontal split)                |
-| `<C-a>h`    | New terminal (horizontal split)                |
-| `<C-S-r>`   | Rename current tab                             |
-| `<C-a>r`    | Rename current tab                             |
-| `<C-v>`     | Paste from system clipboard                    |
-| `<C-a>p`    | Paste from system clipboard                    |
-| `<C-TAB>`   | Next tab                                       |
-| `<C-S-k>`   | Next tab                                       |
-| `<C-S-TAB>` | Previous tab                                   |
-| `<C-S-j>`   | Previous tab                                   |
-| `<C-[NUM]>` | Go to the specified numbered tab               |
-| `<C-tilde>` | Go to last accessed tab                        |
-| `<C-a>l`    | Go to last accessed tab                        |
-| `<C-,>`     | Move current tab to the left                   |
-| `<C-.>`     | Move current tab to the right                  |
-| `<leader>q` | Safe quit (confirm if multiple terminals open) |
-| `<C-a>q`    | Safe quit (confirm if multiple terminals open) |
-| `<C-a>s`    | Launch SSH connection picker                   |
+| Keymap       | Description                                    |
+|--------------|------------------------------------------------|
+| `<C-space>t` | New terminal (tab)                             |
+| `<C-space>v` | New terminal (vertical split)                  |
+| `<C-space>h` | New terminal (horizontal split)                |
+| `<C-space>r` | Rename current tab                             |
+| `<C-space>p` | Paste from system clipboard                    |
+| `<C-space>l` | Go to last accessed tab                        |
+| `<C-space>s` | Launch SSH connection picker                   |
+| `<C-space>q` | Safe quit (confirm if multiple terminals open) |
+
+Non-leader key bindings:
+
+| Keymap       | Description                                    |
+|--------------|------------------------------------------------|
+| `<C-;>`      | Escape terminal mode                           |
+| `<C-t>`      | New terminal (tab)                             |
+| `<C-S-t>`    | New terminal (vertical split)                  |
+| `<C-S-h>`    | New terminal (horizontal split)                |
+| `<C-S-r>`    | Rename current tab                             |
+| `<C-v>`      | Paste from system clipboard                    |
+| `<C-TAB>`    | Next tab                                       |
+| `<C-S-k>`    | Next tab                                       |
+| `<C-S-TAB>`  | Previous tab                                   |
+| `<C-S-j>`    | Previous tab                                   |
+| `<C-[NUM]>`  | Go to the specified numbered tab               |
+| `<C-tilde>`  | Go to last accessed tab                        |
+| `<C-,>`      | Move current tab to the left                   |
+| `<C-.>`      | Move current tab to the right                  |
 
 ### SSH Connection Picker
 

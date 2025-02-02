@@ -5,7 +5,7 @@ local M = {}
 
 M.config = {
   colorscheme = nil,
-  leader = '<C-a>'
+  leader = '<C-space>'
 }
 
 function M.setup(opts)
@@ -135,36 +135,25 @@ function M.move_tab(dir)
 end
 
 function M.set_default_keybinds()
-  local has_whichkey = pcall(function() require('which-key') end)
-
-  if has_whichkey then
-    -- Launch which-key with terminal-specific commands
-    vim.keymap.set({'n', 't'}, '<C-space>', '<C-\\><C-N><CMD>WhichKey ' .. M.config.leader .. '<CR>',
-      {desc = 'Launch which-key with terminal-specific functions'})
-
-    -- Cancel which-key menu
-    vim.keymap.set('n', M.config.leader .. '<space>', '<ESC>', {desc = 'Cancel'})
-  end
-
   -- Terminal ESC
   vim.keymap.set('t', '<C-;>', '<C-\\><C-n>', {desc = 'Terminal mode -> normal mode'})
 
   -- Paste
   vim.keymap.set('t', '<C-v>',
-    function ()
+    function()
       local terminal_job_id = vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')
       vim.api.nvim_chan_send(terminal_job_id, vim.fn.getreg('+'))
     end,
     {desc = 'Paste from system clipboard'})
-  if has_whichkey then
-    vim.keymap.set('n', M.config.leader .. 'p', 'pi', {desc = 'Paste from system clipboard'})
-  end
+  vim.keymap.set('t', M.config.leader .. 'p',
+    function()
+      local terminal_job_id = vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')
+      vim.api.nvim_chan_send(terminal_job_id, vim.fn.getreg('+'))
+    end,
+    {desc = 'Paste from system clipboard'})
 
   -- Safe quit
-  vim.keymap.set('n', '<leader>q', M.safe_quit, {desc = 'Quit (confirm if multiple terms open)'})
-  if has_whichkey then
-    vim.keymap.set('n', M.config.leader .. 'q', M.safe_quit, {desc = 'Quit (confirm if multiple terms open)'})
-  end
+  vim.keymap.set({'n', 't'}, M.config.leader .. 'q', M.safe_quit, {desc = 'Quit (confirm if multiple terms open)'})
 
   -- Previous/next tab
   vim.keymap.set({'n', 't'}, '<C-S-TAB>', '<CMD>tabprevious<CR>', {desc = 'Previous tab', silent = true})
@@ -183,20 +172,16 @@ function M.set_default_keybinds()
 
   -- Last accessed tab
   vim.keymap.set({'n', 't'}, '<C-`>', '<CMD>:tabnext #<CR>', {desc = 'Go to last accessed tab', silent = true})
-  if has_whichkey then
-    vim.keymap.set('n', M.config.leader .. 'l', '<CMD>:tabnext #<CR>', {desc = 'Go to last accessed tab', silent = true})
-  end
+  vim.keymap.set({'n', 't'}, M.config.leader .. 'l', '<CMD>:tabnext #<CR>', {desc = 'Go to last accessed tab', silent = true})
 
   -- New terminal tab
   vim.keymap.set({'n', 't'}, '<C-t>', M.new_tab, {desc = 'New terminal (tab)'})
-  if has_whichkey then
-    vim.keymap.set('n', M.config.leader .. 't',
-      function()
-        M.new_tab()
-        M.rename_tab_prompt()
-      end,
-      {desc = 'New terminal (tab)'})
-  end
+  vim.keymap.set({'n', 't'}, M.config.leader .. 't',
+    function()
+      M.new_tab()
+      M.rename_tab_prompt()
+    end,
+    {desc = 'New terminal (tab)'})
 
   -- New vertical split terminal
   vim.keymap.set(
@@ -209,18 +194,16 @@ function M.set_default_keybinds()
       vim.cmd.startinsert()
     end,
     {desc = 'New terminal (vertical split)'})
-  if has_whichkey then
-    vim.keymap.set(
-      'n',
-      M.config.leader .. 'v',
-      function()
-        vim.cmd.vsplit()
-        vim.cmd.enew()
-        vim.cmd.terminal()
-        vim.cmd.startinsert()
-      end,
-      {desc = 'New terminal (vertical split)'})
-  end
+  vim.keymap.set(
+    {'n', 't'},
+    M.config.leader .. 'v',
+    function()
+      vim.cmd.vsplit()
+      vim.cmd.enew()
+      vim.cmd.terminal()
+      vim.cmd.startinsert()
+    end,
+    {desc = 'New terminal (vertical split)'})
 
   -- New horizontal split terminal
   vim.keymap.set(
@@ -233,24 +216,20 @@ function M.set_default_keybinds()
       vim.cmd.startinsert()
     end,
     {desc = 'New terminal (horizontal split)'})
-  if has_whichkey then
-    vim.keymap.set(
-      {'n', 't'},
-      M.config.leader .. 'h',
-      function()
-        vim.cmd.split()
-        vim.cmd.enew()
-        vim.cmd.terminal()
-        vim.cmd.startinsert()
-      end,
-      {desc = 'New terminal (horizontal split)'})
-  end
+  vim.keymap.set(
+    {'n', 't'},
+    M.config.leader .. 'h',
+    function()
+      vim.cmd.split()
+      vim.cmd.enew()
+      vim.cmd.terminal()
+      vim.cmd.startinsert()
+    end,
+    {desc = 'New terminal (horizontal split)'})
 
   -- Rename tab
   vim.keymap.set({'n', 't'}, '<C-S-r>', M.rename_tab_prompt, {desc = 'Rename tab'})
-  if has_whichkey then
-    vim.keymap.set('n', M.config.leader .. 'r', M.rename_tab_prompt, {desc = 'Rename tab'})
-  end
+  vim.keymap.set({'n', 't'}, M.config.leader .. 'r', M.rename_tab_prompt, {desc = 'Rename tab'})
 
   -- Move tab left/right
   vim.keymap.set({'n', 't'}, '<C-,>', function() M.move_tab('left') end, {desc = 'Move tab left'})
