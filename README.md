@@ -41,8 +41,8 @@ Detailed lazy.nvim config:
     ssh = {
       -- Auto-reconnect SSH connections (on prompt)
       auto_reconnect = true,
-      -- Whether to automically rename the tab/buffer to the hostname of the SSH connection
-      auto_rename_buf = true,
+      -- Whether to automically rename the current tab to the hostname of the SSH connection
+      auto_rename_tab = true,
       -- Whether to cache passwords/passphrases when prompted
       cache_passwords = true,
       -- Lua patterns used to detect an SSH password prompt

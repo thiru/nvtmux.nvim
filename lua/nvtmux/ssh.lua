@@ -4,7 +4,7 @@ local tabs = require('nvtmux.tabs')
 local M = {
   config = {
     auto_reconnect = true,
-    auto_rename_buf = true,
+    auto_rename_tab = true,
     cache_passwords = true,
     password_detect_patterns = {
       'password:$',
@@ -203,7 +203,7 @@ M.open_ssh_terminal = function(target)
     vim.fn.termopen(cmd)
   end
 
-  if (M.config.auto_rename_buf) then
+  if (M.config.auto_rename_tab) then
     tabs.set_tab_name(host)
   end
 
