@@ -1,108 +1,36 @@
-local u = require('nvtmux.utils')
+--- Launches SSH connections in Neovim terminal emulator.
+-- @module nvtmux.ssh.launcher
+local M = {}
+
+local picker = require('nvtmux.ssh.picker')
 local tabs = require('nvtmux.tabs')
 
-local M = {
-  config = {
-    auto_reconnect = true,
-    auto_rename_tab = true,
-    cache_passwords = true,
-    password_detect_patterns = {
-      'password:$',
-      '^Enter passphrase for key.*:$'},
-    password_detect_max_lines = 50
-  },
-  state = {
-    ssh_cache = {},
-    telescope = nil
-  }
+M.state = {
+  ssh_cache = {}
 }
 
+--- Setup the launcher.
+-- @return nil
 M.setup = function(opts)
-  M.config = vim.tbl_deep_extend('force', M.config, (opts or {}))
+  M.config = opts
+  M.create_user_commands()
+  picker.setup(M.open_ssh_terminal)
+end
 
+M.create_user_commands = function()
   vim.api.nvim_create_user_command(
-    'SshPicker',
-    M.picker,
+    'NvtmuxSshPwdReinject',
+    function(opts)
+      M.ssh_pwd_reinject(opts.args)
+    end,
     {bang = true,
-     desc = 'Open Telescope SSH picker'})
+     nargs = 1,
+     desc = 'Request SSH password injection from cache'})
 end
 
-M.load_telescope = function()
-  M.state.telescope = {
-    loaded = true,
-    action_state = require('telescope.actions.state'),
-    actions = require('telescope.actions'),
-    conf = require('telescope.config').values,
-    finders = require('telescope.finders'),
-    pickers = require('telescope.pickers')
-  }
-end
-
-M.parse_ssh_config = function()
-  local source_file = vim.uv.os_homedir() .. '/.ssh/config'
-
-  if not vim.uv.fs_stat(source_file) then
-    return {}
-  end
-
-  local hosts = {}
-
-  for _, line in pairs(vim.fn.readfile(source_file)) do
-    local match = string.match(line, "^%s*Host%s+(.+)%s*$")
-    if match and match ~= '*' then
-      table.insert(hosts, match)
-    end
-  end
-
-  table.sort(hosts)
-  return hosts
-end
-
-M.parse_known_hosts = function()
-  local source_file = vim.uv.os_homedir() .. '/.ssh/known_hosts'
-
-  if not vim.uv.fs_stat(source_file) then
-    return {}
-  end
-
-  local hosts = {}
-
-  for _, line in pairs(vim.fn.readfile(source_file)) do
-    local match = string.match(line, "^%s*([%w.]+)[%s\\,]")
-    if match and not vim.tbl_contains(hosts, match) then
-      table.insert(hosts, match)
-    end
-  end
-
-  table.sort(hosts, u.sort_alpha_before_number)
-  return hosts
-end
-
-M.parse_hosts = function()
-  local hosts = M.parse_ssh_config()
-
-  for _, v in pairs(M.parse_known_hosts()) do
-    if not vim.tbl_contains(hosts, v) then
-      table.insert(hosts, v)
-    end
-  end
-
-  return hosts
-end
-
-M.get_user_sel_host = function()
-  local selection = M.state.telescope.action_state.get_selected_entry()
-  local host = ''
-
-  if selection == nil then
-    host = M.state.telescope.action_state.get_current_line()
-  else
-    host = selection[1]
-  end
-
-  return host
-end
-
+--- Alter SSH cache for the specified buffer in order to automatically inject the cached password.
+-- @param bufnr string The respective buffer number
+-- @return nil
 M.ssh_pwd_reinject = function(bufnr)
   vim.schedule(function ()
     local ssh_cache = M.state.ssh_cache[tonumber(bufnr)]
@@ -111,8 +39,14 @@ M.ssh_pwd_reinject = function(bufnr)
   end)
 end
 
+--- Launch a new SSH terminal.
+-- @param target string Specifies the target of the terminal session. This is one of:
+-- - this - the current window
+-- - tab - a new tab
+-- - * - a vim target command like `split`, `vsplit`, etc.
+-- @return nil
 M.open_ssh_terminal = function(target)
-  local host = M.get_user_sel_host()
+  local host = picker.get_user_sel_host()
   local cmd = nil
 
   -- Open in the current buffer
@@ -210,48 +144,6 @@ M.open_ssh_terminal = function(target)
   vim.schedule(function()
     vim.cmd.startinsert()
   end)
-end
-
-M.picker = function(opts)
-  opts = opts or {}
-
-  if M.state.telescope == nil and (not pcall(M.load_telescope)) then
-    error("Telescope is required for nvtmux's SSH picker")
-  end
-
-  M.state.telescope.pickers.new(opts, {
-    prompt_title = 'SSH Picker',
-    finder = M.state.telescope.finders.new_table({
-      results = M.parse_hosts()
-    }),
-    sorter = M.state.telescope.conf.generic_sorter(opts),
-    attach_mappings = function(prompt_bufnr, _)
-      -- Open in the current buffer
-      M.state.telescope.actions.select_default:replace(function()
-        M.state.telescope.actions.close(prompt_bufnr)
-        M.open_ssh_terminal('this')
-      end)
-
-      -- Open in a new tab
-      M.state.telescope.actions.select_tab:replace(function()
-        M.state.telescope.actions.close(prompt_bufnr)
-        M.open_ssh_terminal('tab')
-      end)
-
-      -- Open in a horizontal split
-      M.state.telescope.actions.select_horizontal:replace(function()
-        M.state.telescope.actions.close(prompt_bufnr)
-        M.open_ssh_terminal('split')
-      end)
-
-      -- Open in a vertical split
-      M.state.telescope.actions.select_vertical:replace(function()
-        M.state.telescope.actions.close(prompt_bufnr)
-        M.open_ssh_terminal('vsplit')
-      end)
-      return true
-    end,
-  }):find()
 end
 
 return M
