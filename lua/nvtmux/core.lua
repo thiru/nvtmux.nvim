@@ -11,9 +11,9 @@ M.config = {
 function M.setup(opts)
   M.config = vim.tbl_deep_extend('force', M.config, opts)
   M.set_term_opts()
-  tabs.init()
   M.setup_autocmds()
   M.set_default_keybinds()
+  tabs.init()
 end
 
 function M.set_term_opts()
