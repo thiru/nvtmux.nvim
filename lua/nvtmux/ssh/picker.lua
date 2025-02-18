@@ -1,11 +1,10 @@
 --- Telescope-based interface for picking SSH connections.
--- @module nvtmux.ssh.picker
+
 local M = {}
 
 local ssh_parser = require('nvtmux.ssh.parser')
 
 --- Setup the picker.
--- @return nil
 M.setup = function(on_picker_action)
   M.on_picker_action = on_picker_action
   M.create_picker_user_command()

@@ -1,11 +1,11 @@
 --- Parses the user's SSH config and known_hosts files for hosts
--- @module nvtmux.ssh.parser
+
 local M = {}
 
 local u = require('nvtmux.utils')
 
 --- Parse the user's SSH config for hosts.
--- @return table A list of host names
+---@return string[] names A list of host names
 M.parse_ssh_config = function()
   local source_file = vim.uv.os_homedir() .. '/.ssh/config'
 

@@ -1,21 +1,20 @@
-local u = require('nvtmux.utils')
-local tabs = require('nvtmux.tabs')
+--- Contains the core functionality of this plugin.
 
 local M = {}
 
-M.config = {
-  colorscheme = nil,
-  leader = '<C-space>'
-}
+local u = require('nvtmux.utils')
+local tabs = require('nvtmux.tabs')
 
-function M.setup(opts)
-  M.config = vim.tbl_deep_extend('force', M.config, opts)
+--- Setup core aspects of the plugin.
+---@param config nvtmux.Config
+function M.setup(config)
+  M.config = config
   M.set_term_opts()
-  tabs.init()
-  M.setup_autocmds()
-  M.set_default_keybinds()
+  M.create_autocmds()
+  M.set_keybinds()
 end
 
+--- Set (subjectively) optimal settings for a good terminal experience.
 function M.set_term_opts()
   vim.opt.cursorline = false
   vim.opt.scrolloff = 0
@@ -31,7 +30,11 @@ function M.set_term_opts()
   end
 end
 
-function M.setup_autocmds()
+--- Create various auto-commands to provide a more seamless experience such as:
+--- - updating the OS window title to that of the current tab
+--- - ensure we're in insert mode after switching to another tab
+--- - quit if last terminal exits
+function M.create_autocmds()
   vim.api.nvim_create_autocmd('TabEnter', {
     callback = function ()
       -- Update window title
@@ -90,12 +93,14 @@ function M.setup_autocmds()
   })
 end
 
+--- Create a new tab with a terminal and enter insert mode.
 function M.new_tab()
   vim.cmd('tabnew')
   vim.cmd.terminal()
   vim.cmd.startinsert()
 end
 
+--- Show prompt to rename the current tab.
 function M.rename_tab_prompt()
   local curr_name = tabs.get_tab_name()
   local new_name = vim.fn.input('Tab Name', curr_name)
@@ -105,6 +110,7 @@ function M.rename_tab_prompt()
   end
 end
 
+--- Safely quit Neovim. I.e. if more than one terminal session is open prompt the user first.
 function M.safe_quit()
   vim.schedule(function()
     if u.num_terms_open() > 1 then
@@ -118,6 +124,8 @@ function M.safe_quit()
   end)
 end
 
+--- Go to the specified tab number
+---@param num number
 function M.go_to_tab(num)
   local tab_handles = vim.api.nvim_list_tabpages()
   if (#tab_handles > 1) and (num <= #tab_handles) then
@@ -125,17 +133,22 @@ function M.go_to_tab(num)
   end
 end
 
+--- Move the current tab in the respective direction.
+---@param dir number Moves the current tab to the left if negative and to the right if positive.
 function M.move_tab(dir)
-  if dir == 'left' then
+  if dir == 0 then
+    return
+  elseif dir < 0 then
     vim.cmd('-tabmove')
-  else
+  elseif dir > 0 then
     vim.cmd('+tabmove')
   end
 
   vim.cmd('redraw!')
 end
 
-function M.set_default_keybinds()
+--- Define key bindings. These are mostly leader-key-based.
+function M.set_keybinds()
   -- Terminal ESC
   vim.keymap.set('t', '<C-;>', '<C-\\><C-n>', {desc = 'Terminal mode -> normal mode'})
 
@@ -233,8 +246,8 @@ function M.set_default_keybinds()
   vim.keymap.set({'n', 't'}, M.config.leader .. 'r', M.rename_tab_prompt, {desc = 'Rename tab'})
 
   -- Move tab left/right
-  vim.keymap.set({'n', 't'}, '<C-,>', function() M.move_tab('left') end, {desc = 'Move tab left'})
-  vim.keymap.set({'n', 't'}, '<C-.>', function() M.move_tab('right') end, {desc = 'Move tab right'})
+  vim.keymap.set({'n', 't'}, '<C-,>', function() M.move_tab(-1) end, {desc = 'Move tab left'})
+  vim.keymap.set({'n', 't'}, '<C-.>', function() M.move_tab(1) end, {desc = 'Move tab right'})
 
   -- SSH picker
   vim.keymap.set({'n', 't'}, M.config.leader .. 's', '<CMD>SshPicker<CR>', {desc = 'Launch [S]SH connection picker'})

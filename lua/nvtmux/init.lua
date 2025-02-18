@@ -1,34 +1,27 @@
-local c = require('nvtmux.core')
+--- A plugin to use Neovim as a terminal multiplexor.
+
+local M = {}
+
+local config = require('nvtmux.config')
+local core = require('nvtmux.core')
 local ssh = require('nvtmux.ssh')
-local _ = require('nvtmux.utils')
+local tabs = require('nvtmux.tabs')
 
-local M = {
-  doc = [[
-    Use Neovim as a terminal multiplexor, much like tmux but without
-    persistance and session management.
-    ]],
-  core = c
-}
+--- Setup and start this plugin.
+---
+---@param user_config nvtmux.Config? Custom user configuration
+---
+---@return nvtmux.Config config The effective configuration used by the plugin
+function M.setup(user_config)
+  local merged_config = vim.tbl_deep_extend('force', config, user_config)
 
-function M.setup(opts)
-  opts = opts or {}
-
-  vim.api.nvim_create_user_command(
-    'NvtmuxStart',
-    function ()
-      M.start(opts)
-    end,
-    {bang = true,
-     desc = 'Start nvtmux mode'})
-
-  M.start(opts)
-  ssh.setup(opts.ssh)
-end
-
-function M.start(opts)
-  c.setup(opts)
+  core.setup(merged_config)
+  tabs.setup()
+  ssh.setup(merged_config)
   vim.cmd.terminal()
   vim.cmd.startinsert()
+
+  return merged_config
 end
 
 return M

@@ -1,10 +1,15 @@
+--- Various facilities around tabs.
+
 local M = {}
 
-function M.init()
+--- Setup the tabline.
+function M.setup()
   _G.nvtmux_tabline = M.set_tabline
   vim.opt.tabline = '%!v:lua.nvtmux_tabline()'
 end
 
+--- Function used to generate the tabline text.
+---@return string tabline The text for the tab
 function M.set_tabline()
   local tabline = ''
   local current_tab = vim.api.nvim_get_current_tabpage()
@@ -26,6 +31,8 @@ function M.set_tabline()
   return tabline
 end
 
+--- Get the name of the respective tab.
+---@param tab any A tab page handle
 function M.get_tab_name(tab)
   tab = tab or vim.api.nvim_get_current_tabpage()
 
@@ -33,7 +40,7 @@ function M.get_tab_name(tab)
   if ok then
     return name
   else
-    -- Fallback to active buffer's filename
+    -- Fallback to the active buffer's filename
     local win = vim.api.nvim_tabpage_get_win(tab)
     local buf = vim.api.nvim_win_get_buf(win)
     local bufname = vim.api.nvim_buf_get_name(buf)
@@ -41,15 +48,20 @@ function M.get_tab_name(tab)
   end
 end
 
+--- Set the current tab's name to what is given.
+---@param name string
 function M.set_tab_name(name)
   vim.api.nvim_tabpage_set_var(0, 'tabname', name)
   vim.opt.titlestring = name
   vim.cmd('redraw!')
 end
 
-function M.superscript_number(n)
+--- Gets a superscript number for the given number.
+---@param num number
+---@return string superscript The superscript character or an empty string if the given number is greater than 10
+function M.superscript_number(num)
   local super_map = {'¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹', '⁰'}
-  return super_map[n] or ''
+  return super_map[num] or ''
 end
 
 return M
