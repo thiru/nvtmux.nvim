@@ -1,18 +1,18 @@
 --- Telescope-based interface for picking SSH connections.
--- @module nvtmux.ssh.picker
+
 local M = {}
 
 local ssh_parser = require('nvtmux.ssh.parser')
 
 --- Setup the picker.
--- @return nil
+---@param on_picker_action fun(target: string) This function is run when a picker selection is made
+---@see nvtmux.ssh.laucher.open_ssh_terminal
 M.setup = function(on_picker_action)
   M.on_picker_action = on_picker_action
   M.create_picker_user_command()
 end
 
 --- Create a user command to open the picker.
--- @return nil
 M.create_picker_user_command = function()
   vim.api.nvim_create_user_command(
     'SshPicker',
@@ -22,7 +22,6 @@ M.create_picker_user_command = function()
 end
 
 --- Load all necessary Telescope modules.
--- @return nil
 M.load_telescope = function()
   M.telescope = {
     action_state = require('telescope.actions.state'),
@@ -34,7 +33,7 @@ M.load_telescope = function()
 end
 
 --- Get the host the user selected from the picker.
--- @return string The selected host name
+---@return string hostname The selected host name
 M.get_user_sel_host = function()
   local selection = M.telescope.action_state.get_selected_entry()
   local host = ''
@@ -49,8 +48,7 @@ M.get_user_sel_host = function()
 end
 
 --- Open the SSH picker.
--- @param opts table Options for Telescope
--- @return nil
+---@param opts table? Options for Telescope
 M.picker = function(opts)
   opts = opts or {}
 

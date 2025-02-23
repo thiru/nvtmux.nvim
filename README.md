@@ -21,50 +21,21 @@ Minimal lazy.nvim config:
 ```lua
 {
   'thiru/nvtmux.nvim',
+
+  -- See below for why cond is used
   cond = vim.g.nvtmux_auto_start == true,
+
+  -- Used by the SSH connection picker (optional)
+  depedencies = {'nvim-telescope/telescope.nvim'},
+
+  ---@type nvtmux.Config
+  opts = {},
 }
 ```
 
 ## Configuration
 
-Detailed lazy.nvim config:
-
-```lua
-{
-  'thiru/nvtmux.nvim',
-
-  -- See below for why cond is used
-  cond = vim.g.nvtmux_auto_start == true,
-
-  depedencies = {'nvim-telescope/telescope.nvim'}, -- For the SSH connection picker (optional)
-
-  opts = {
-    -- Optionally specify a custom colour scheme when using this plugin
-    colorscheme = 'catppuccin-mocha',
-
-    -- The leader key is used for many key binds to avoid conflicting with nested vim instances
-    -- I believe tmux follows a similar approach
-    leader = '<C-space>',
-
-    -- SSH picker options
-    ssh = {
-      -- Automatically reconnect disconnected sessions (on prompt only)
-      auto_reconnect = true,
-
-      -- Automatically rename the current tab to the hostname of the SSH connection
-      auto_rename_tab = true,
-
-      -- Cache passwords/passphrases when prompted
-      cache_passwords = true,
-
-      -- Lua patterns used to detect an SSH password prompt
-      password_detect_patterns = {
-        'password:$',
-        '^Enter passphrase for key'},
-    },
-  },
-}
-```
+See [config.lua](./lua/nvtmux/config.lua) for details on the configuration.
 
 ## Usage
 
