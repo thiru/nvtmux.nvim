@@ -78,7 +78,12 @@ end
 --- The parameters are the same as `vim.fn.termopen`.
 M.on_term_stdout = function(chan_id, data, _)
   local bufnr = vim.api.nvim_get_current_buf()
+
   local buffer_cache = M.state.buffers[bufnr]
+  if buffer_cache == nil then
+    return
+  end
+
   local cached_pwd = (M.state.pwds[buffer_cache.host] or '')
   local max_stdout_lines_read = buffer_cache.stdout_line_count >= max_lines_detect
 
