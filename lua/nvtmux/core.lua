@@ -1,6 +1,8 @@
 --- Contains the core functionality of this plugin.
 
-local M = {}
+local M = {
+  state = {}
+}
 
 local u = require('nvtmux.utils')
 local tabs = require('nvtmux.tabs')
@@ -26,6 +28,7 @@ function M.set_term_opts()
   vim.opt.title = true
 
   if M.config.colorscheme ~= nil then
+    M.state.original_colors = vim.g.colors_name
     vim.cmd.colorscheme(M.config.colorscheme)
   end
 end
@@ -42,8 +45,13 @@ function M.create_autocmds()
 
       -- When switching tabs ensure we're in terminal insert mode
       vim.schedule(function ()
-        if u.is_terminal_buf() and vim.fn.mode() ~= 't' then
-          vim.cmd.startinsert()
+        if u.is_terminal_buf() then
+          M.ensure_term_colors()
+          if vim.fn.mode() ~= 't' then
+            vim.cmd.startinsert()
+          end
+        else
+          M.ensure_non_term_colors()
         end
       end)
     end,
@@ -91,6 +99,20 @@ function M.create_autocmds()
     group = vim.api.nvim_create_augroup('nvtmux_termleave', {}),
     pattern = '*',
   })
+end
+
+--- Ensure the user-preferred terminal colorscheme is in use.
+function M.ensure_term_colors()
+  if M.config.colorscheme and (vim.g.colors_name ~= M.config.colorscheme) then
+    vim.cmd.colorscheme(M.config.colorscheme)
+  end
+end
+
+--- Ensure the user's default colorscheme is in use.
+function M.ensure_non_term_colors()
+  if M.config.colorscheme and (vim.g.colors_name ~= M.state.original_colors) then
+    vim.cmd.colorscheme(M.state.original_colors)
+  end
 end
 
 --- Create a new tab with a terminal and enter insert mode.
