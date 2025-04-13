@@ -197,6 +197,9 @@ function M.set_keybinds()
     end,
     {desc = 'New terminal (tab)'})
 
+  -- Tab close
+  vim.keymap.set('n', M.config.leader .. 'd', '<CMD>tabclose<CR>', {desc = 'Close tab'})
+
   -- New vertical split terminal
   vim.keymap.set(
     {'n', 't'},
