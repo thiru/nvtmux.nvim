@@ -75,7 +75,7 @@ M.get_ssh_cmd = function(host, bufnr)
 end
 
 --- Reads each line of stdout of the terminal in order to prompt and inject SSH passwords.
---- The parameters are the same as `vim.fn.termopen`.
+--- The parameters are the same as `vim.fn.jobstart`.
 M.on_term_stdout = function(chan_id, data, _)
   local bufnr = vim.api.nvim_get_current_buf()
 
@@ -139,7 +139,7 @@ M.open_ssh_terminal = function(target)
 
   -- Start a Neovim terminal
   if not M.config.password_detection.enabled then
-    vim.fn.termopen(cmd)
+    vim.fn.jobstart(cmd)
   else
     M.state.buffers[bufnr] = {
       host = host,
@@ -147,7 +147,7 @@ M.open_ssh_terminal = function(target)
       -- Count stdout lines processed so we don't keep trying to detect an SSH password prompt for too long
       stdout_line_count = 0}
 
-    vim.fn.termopen(cmd, {on_stdout = M.on_term_stdout})
+    vim.fn.jobstart(cmd, {term = true, on_stdout = M.on_term_stdout})
   end
 
   if (M.config.auto_rename_tab) then
