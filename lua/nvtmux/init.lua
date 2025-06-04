@@ -18,7 +18,13 @@ function M.setup(config)
   core.setup(merged_config)
   tabs.setup()
   ssh.setup(merged_config)
-  vim.cmd.terminal()
+
+  if vim.g.nvtmux_auto_start_cmd ~= nil and #vim.g.nvtmux_auto_start_cmd > 0 then
+    vim.fn.jobstart(vim.g.nvtmux_auto_start_cmd, {term = true})
+  else
+    vim.cmd.terminal()
+  end
+
   vim.cmd.startinsert()
 
   return merged_config

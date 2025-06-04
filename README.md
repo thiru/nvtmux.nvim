@@ -82,6 +82,14 @@ Non-leader key bindings:
 | `<C-,>`      | Move current tab to the left                   |
 | `<C-.>`      | Move current tab to the right                  |
 
+**Auto-Start Command**
+
+It's also possible to specify a command to run when the terminal starts like so:
+
+```shell
+nvim --cmd 'lua vim.g.nvtmux_auto_start = true' --cmd 'lua vim.g.nvtmux_auto_start_cmd = "SOME_CMD"'
+```
+
 ### SSH Connection Picker
 
 To start the Telescope SSH connection picker use the keymap defined above or run:
