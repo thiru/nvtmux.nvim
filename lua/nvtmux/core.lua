@@ -68,9 +68,12 @@ function M.create_autocmds()
     pattern = '*',
   })
 
-  -- Ensure we're in insert mode if we've come into another terminal buffer
   vim.api.nvim_create_autocmd('TermClose', {
     callback = function()
+      -- Avoid "Process exited 0" message
+      vim.api.nvim_input('<CR>')
+
+      -- Ensure we're in insert mode if we've come into another terminal buffer
       -- HACK: Not sure why I need to set `startinsert` in a timeout. It doesn't seem to work otherwise.
       if u.is_terminal_buf() then
         local timer = vim.uv.new_timer()
