@@ -42,6 +42,9 @@ function M.create_autocmds()
       -- Update window title
       vim.opt.titlestring = tabs.get_tab_name()
 
+      -- HACK: ensure the winbar isn't visible. Some windows like Telescope ones seem to enable it
+      vim.opt.winbar = ''
+
       -- When switching tabs ensure we're in terminal insert mode
       vim.schedule(function ()
         if u.is_terminal_buf() then
