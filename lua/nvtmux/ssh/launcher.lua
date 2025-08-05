@@ -93,7 +93,7 @@ M.on_term_stdout = function(chan_id, data, _)
       buffer_cache.stdout_line_count = buffer_cache.stdout_line_count + 1
       for _, pattern in ipairs(M.config.password_detection.patterns) do
         if (line:find(pattern)) then
-          local msg = 'Enter password for ' .. buffer_cache.host .. ':'
+          local msg = 'Enter password for ' .. buffer_cache.host .. ': '
           cached_pwd = (vim.fn.inputsecret(msg, cached_pwd) or '')
           if #cached_pwd > 0 then
             M.state.pwds[buffer_cache.host] = cached_pwd
@@ -113,7 +113,7 @@ M.open_ssh_terminal = function(target)
 
   -- Prompt to replace current buffer with terminal
   if target == 'this' then
-    local confirm = vim.fn.input('Wipe out the current buffer and connect to ' .. host .. '?', 'yes')
+    local confirm = vim.fn.input('Wipe out the current buffer and connect to ' .. host .. '? ', 'yes')
     if vim.trim(confirm) ~= 'yes' then
       vim.schedule(function()
         vim.cmd.startinsert()

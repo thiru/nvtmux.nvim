@@ -127,7 +127,7 @@ end
 --- Show prompt to rename the current tab.
 function M.rename_tab_prompt()
   local curr_name = tabs.get_tab_name()
-  local new_name = vim.fn.input('Tab Name', curr_name)
+  local new_name = vim.fn.input('Tab Name: ', curr_name)
 
   if #new_name > 0 then
     tabs.set_tab_name(new_name)
