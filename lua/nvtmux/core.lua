@@ -5,7 +5,6 @@ local M = {
 }
 
 local u = require('nvtmux.utils')
-local tabs = require('nvtmux.tabs')
 
 --- Setup core aspects of the plugin.
 ---@param config nvtmux.Config
@@ -39,8 +38,7 @@ end
 function M.create_autocmds()
   vim.api.nvim_create_autocmd('TabEnter', {
     callback = function ()
-      -- Update window title
-      vim.opt.titlestring = tabs.get_tab_name()
+      u.update_window_title()
 
       -- When switching tabs ensure we're in terminal insert mode
       vim.schedule(function ()
@@ -126,11 +124,23 @@ end
 
 --- Show prompt to rename the current tab.
 function M.rename_tab_prompt()
-  local curr_name = tabs.get_tab_name()
+  local curr_name = u.get_tab_name()
   local new_name = vim.fn.input('Tab Name: ', curr_name)
 
   if #new_name > 0 then
-    tabs.set_tab_name(new_name)
+    u.set_tab_name(new_name)
+    u.update_window_title()
+  end
+end
+
+--- Show prompt to set a window prefix.
+function M.set_window_prefix_prompt()
+  local curr_prefix = vim.g.nvtmux_window_prefix or ''
+  local new_prefix = vim.fn.input('Window Prefix: ', curr_prefix)
+
+  if #new_prefix > 0 then
+    vim.g.nvtmux_window_prefix = new_prefix
+    u.update_window_title()
   end
 end
 
@@ -278,6 +288,9 @@ function M.set_keybinds()
 
   -- SSH picker
   vim.keymap.set({'n', 't'}, M.config.leader .. 's', '<CMD>SshPicker<CR>', {desc = 'Launch [S]SH connection picker'})
+
+  -- Window prefix
+  vim.keymap.set({'n', 't'}, M.config.leader .. 'w', M.set_window_prefix_prompt, {desc = 'Set [W]indow Prefix'})
 end
 
 return M

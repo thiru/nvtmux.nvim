@@ -5,7 +5,7 @@ local M = {}
 local default_config = require('nvtmux.config')
 local core = require('nvtmux.core')
 local ssh = require('nvtmux.ssh')
-local tabs = require('nvtmux.tabs')
+local tabline = require('nvtmux.tabline')
 
 --- Setup and start plugin.
 ---
@@ -16,7 +16,7 @@ function M.setup(config)
   local merged_config = vim.tbl_deep_extend('force', default_config, config)
 
   core.setup(merged_config)
-  tabs.setup()
+  tabline.setup()
   ssh.setup(merged_config)
 
   if vim.g.nvtmux_auto_start_cmd ~= nil and #vim.g.nvtmux_auto_start_cmd > 0 then

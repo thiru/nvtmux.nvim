@@ -3,7 +3,7 @@
 local M = {}
 
 local picker = require('nvtmux.ssh.picker')
-local tabs = require('nvtmux.tabs')
+local u = require('nvtmux.utils')
 
 --- On SSH authentication requests, at most this many lines will be inspected. This is an optimisation attempt in order to reduce unnecessary processing after a login has succeeded.
 ---@type number
@@ -151,7 +151,8 @@ M.open_ssh_terminal = function(target)
   end
 
   if (M.config.auto_rename_tab) then
-    tabs.set_tab_name(host)
+    u.set_tab_name(host)
+    u.update_window_title()
   end
 
   vim.schedule(function()

@@ -2,6 +2,30 @@
 
 local M = {}
 
+--- Get the name of the respective tab.
+---@param tab any A tab page handle
+function M.get_tab_name(tab)
+  tab = tab or vim.api.nvim_get_current_tabpage()
+
+  local ok, name = pcall(vim.api.nvim_tabpage_get_var, tab, 'tabname')
+  if ok then
+    return name
+  else
+    -- Fallback to the active buffer's filename
+    local win = vim.api.nvim_tabpage_get_win(tab)
+    local buf = vim.api.nvim_win_get_buf(win)
+    local bufname = vim.api.nvim_buf_get_name(buf)
+    return bufname:match("([^/\\]+)$") or "[No Name]"
+  end
+end
+
+--- Set the current tab's name to what is given.
+---@param name string
+function M.set_tab_name(name)
+  vim.api.nvim_tabpage_set_var(0, 'tabname', name)
+  vim.cmd('redraw!')
+end
+
 --- Determine if the current buffer is a terminal.
 function M.is_terminal_buf()
   return type(vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')) == 'number'
@@ -18,6 +42,11 @@ function M.num_terms_open()
   end
 
   return num_terms
+end
+
+--- Update the window title according to an optional user-defined prefix and tab name.
+function M.update_window_title()
+  vim.opt.titlestring = (vim.g.nvtmux_window_prefix or '') .. M.get_tab_name()
 end
 
 --- Sort the given such that strings starting with alphabetic characters precede those starting
