@@ -14,8 +14,22 @@ local ssh = require('nvtmux.ssh')
 function M.setup(config)
   local merged_config = vim.tbl_deep_extend('force', default_config, config)
 
-  core.setup(merged_config)
-  ssh.setup(merged_config)
+  vim.api.nvim_create_user_command('NvtmuxStart', function()
+    M.start(merged_config)
+  end, {})
+
+  if merged_config.auto_start then
+    M.start(merged_config)
+  end
+
+  return merged_config
+end
+
+--- Start terminal mode.
+---@param config nvtmux.Config Custom user configuration
+function M.start(config)
+  core.setup(config)
+  ssh.setup(config)
 
   if vim.g.nvtmux_auto_start_cmd ~= nil and #vim.g.nvtmux_auto_start_cmd > 0 then
     vim.fn.jobstart(vim.g.nvtmux_auto_start_cmd, {term = true})
@@ -24,8 +38,6 @@ function M.setup(config)
   end
 
   vim.cmd.startinsert()
-
-  return merged_config
 end
 
 return M

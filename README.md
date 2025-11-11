@@ -22,11 +22,10 @@ Minimal lazy.nvim config:
 {
   'thiru/nvtmux.nvim',
 
-  -- See below for why cond is used
-  cond = vim.g.nvtmux_auto_start == true,
-
-  -- Used by the SSH connection picker (optional)
-  depedencies = {'nvim-telescope/telescope.nvim'},
+  depedencies = {
+    'nvim-lualine/lualine.nvim', -- (optional) Has a nice tabline
+    'nvim-telescope/telescope.nvim' -- (optional) Used by the SSH connection picker
+  },
 
   ---@type nvtmux.Config
   opts = {},
@@ -40,13 +39,12 @@ See [config.lua](./lua/nvtmux/config.lua) for details on the configuration.
 ## Usage
 
 You likely don't want this plugin to start every time you run Neovim as it alters the appearance
-and behaviour considerably in order to behave as a terminal multiplexor. This is the purpose of the
-`cond` expression in the Lazy config above.
-
-I would recommend creating an alias or shortcut in your OS to start Neovim with Nvtmux like so:
+and behaviour considerably in order to behave as a terminal multiplexor. So, you can either start
+it manually after starting Neovim with the `:NvtmuxStart` command, or you can use this command on
+start-up like so:
 
 ```shell
-nvim --cmd 'lua vim.g.nvtmux_auto_start = true'
+nvim +NvtmuxStart
 ```
 
 As in tmux, nvtmux uses a prefix for many of its commands so that they don't conflict with possibly
@@ -87,7 +85,7 @@ Non-leader key bindings:
 It's also possible to specify a command to run when the terminal starts like so:
 
 ```shell
-nvim --cmd 'lua vim.g.nvtmux_auto_start = true' --cmd 'lua vim.g.nvtmux_auto_start_cmd = "SOME_CMD"'
+nvim +NvtmuxStart --cmd 'lua vim.g.nvtmux_auto_start_cmd = "htop"'
 ```
 
 ### SSH Connection Picker
