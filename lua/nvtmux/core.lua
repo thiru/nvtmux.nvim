@@ -86,12 +86,17 @@ function M.create_autocmds()
     pattern = '*',
   })
 
-  -- Exit if no there are no more terminals open
+  -- Close tab if empty, or exit Neovim altogether if this is also the last tab
   vim.api.nvim_create_autocmd('TermLeave', {
     callback = function()
       vim.schedule(function()
-        if u.num_terms_open() == 0 then
-          vim.cmd.quit()
+        if u.is_empty_tab() then
+          local tabs = vim.api.nvim_list_tabpages()
+          if #tabs == 1 then
+            vim.cmd.quit()
+          else
+            vim.cmd.tabclose()
+          end
         end
       end)
     end,

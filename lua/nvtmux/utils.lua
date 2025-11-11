@@ -68,4 +68,44 @@ function M.sort_alpha_before_number(a, b)
   return a < b
 end
 
+--- Get details of valid buffers in the current tab.
+function M.buffer_tabs()
+  local tabnr = vim.api.nvim_get_current_tabpage()
+  local windows = vim.api.nvim_tabpage_list_wins(tabnr)
+  local buffers = {}
+
+  for _, win in ipairs(windows) do
+    local buf_id = vim.api.nvim_win_get_buf(win)
+    if not buffers[buf_id] then
+      local buf_info = {
+        id = buf_id,
+        name = vim.api.nvim_buf_get_name(buf_id),
+        is_valid = vim.api.nvim_buf_is_valid(buf_id),
+        is_loaded = vim.api.nvim_buf_is_loaded(buf_id),
+        is_modified = vim.api.nvim_get_option_value('modified', {buf=buf_id}),
+        is_listed = vim.api.nvim_get_option_value('buflisted', {buf=buf_id}),
+        -- filetype = vim.api.nvim_get_option_value('filetype', {buf=buf_id}),
+        -- line_count = vim.api.nvim_buf_line_count(buf_id)
+      }
+
+      if buf_info.is_valid and buf_info.is_listed and buf_info.is_loaded then
+        table.insert(buffers, buf_info)
+      end
+    end
+  end
+
+  return buffers
+end
+
+--- Determine if the current tab is empty.
+function M.is_empty_tab()
+  local buffers = M.buffer_tabs()
+
+  if #buffers == 0 then
+    return true
+  end
+
+  return #buffers == 1 and buffers[1].name == '' and buffers[1].is_modified == false
+end
+
 return M
