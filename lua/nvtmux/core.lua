@@ -22,7 +22,6 @@ function M.set_term_opts()
   vim.opt.number = false
   vim.opt.relativenumber = false
   vim.opt.signcolumn = 'no'
-  vim.opt.laststatus = 0
   vim.opt.title = true
 
   if M.config.colorscheme ~= nil then
