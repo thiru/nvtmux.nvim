@@ -2,6 +2,16 @@
 
 local M = {}
 
+-- Get path with home directory replaced with tilde.
+function M.replace_home_with_tilde(path)
+  local home_dir = vim.uv.os_homedir() or ''
+  if vim.startswith(path, home_dir) then
+    return '~' .. string.sub(path, #home_dir + 1)
+  else
+    return path
+  end
+end
+
 --- Get the name of the respective tab.
 ---@param tab any A tab page handle
 function M.get_tab_name(tab)
@@ -23,6 +33,7 @@ end
 ---@param name string
 function M.set_tab_name(name)
   vim.api.nvim_tabpage_set_var(0, 'tabname', name)
+  vim.api.nvim_tabpage_set_var(0, 'has_custom_tabname', true)
   vim.cmd('redraw!')
 end
 
@@ -106,6 +117,22 @@ function M.is_empty_tab()
   end
 
   return #buffers == 1 and buffers[1].name == '' and buffers[1].is_modified == false
+end
+
+--- Update the current tab's name to the CWD, but only if a custom name was not already given.
+function M.auto_set_tab_name()
+  local tab = vim.api.nvim_get_current_tabpage()
+
+  -- If a custom name was set then just keep using it
+  local ok = pcall(vim.api.nvim_tabpage_get_var, tab, 'has_custom_tabname')
+  if ok then
+    return
+  end
+
+  if vim.bo[vim.api.nvim_get_current_buf()].buftype == 'terminal' then
+    local name = M.replace_home_with_tilde(vim.fn.getcwd())
+    vim.api.nvim_tabpage_set_var(tab, 'tabname', name)
+  end
 end
 
 return M

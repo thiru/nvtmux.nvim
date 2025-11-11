@@ -103,6 +103,13 @@ function M.create_autocmds()
     group = vim.api.nvim_create_augroup('nvtmux_termleave', {}),
     pattern = '*',
   })
+
+  -- Use CWD for tab name if custom name not already set
+  vim.api.nvim_create_autocmd('DirChanged', {
+    callback = u.auto_set_tab_name,
+    group = vim.api.nvim_create_augroup('nvtmux_dirchanged', {}),
+    pattern = '*',
+  })
 end
 
 --- Ensure the user-preferred terminal colorscheme is in use.
