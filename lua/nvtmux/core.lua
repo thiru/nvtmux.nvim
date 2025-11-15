@@ -73,13 +73,15 @@ function M.create_autocmds()
       -- HACK: Not sure why I need to set `startinsert` in a timeout. It doesn't seem to work otherwise.
       if u.is_terminal_buf() then
         local timer = vim.uv.new_timer()
-        timer:start(10, 0, function()
-          timer:stop()
-          timer:close()
-          vim.schedule(function()
-            vim.cmd.startinsert()
+        if timer ~= nil then
+          timer:start(10, 0, function()
+            timer:stop()
+            timer:close()
+            vim.schedule(function()
+              vim.cmd.startinsert()
+            end)
           end)
-        end)
+        end
       end
     end,
     group = vim.api.nvim_create_augroup('nvtmux_termclose', {}),
