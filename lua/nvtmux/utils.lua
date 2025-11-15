@@ -120,7 +120,7 @@ function M.is_empty_tab()
 end
 
 --- Update the current tab's name to the CWD, but only if a custom name was not already given.
-function M.auto_set_tab_name()
+function M.auto_set_tab_name(path)
   local tab = vim.api.nvim_get_current_tabpage()
 
   -- If a custom name was set then just keep using it
@@ -130,7 +130,7 @@ function M.auto_set_tab_name()
   end
 
   if vim.bo[vim.api.nvim_get_current_buf()].buftype == 'terminal' then
-    local name = M.replace_home_with_tilde(vim.fn.getcwd())
+    local name = M.replace_home_with_tilde(path)
     vim.api.nvim_tabpage_set_var(tab, 'tabname', name)
   end
 end

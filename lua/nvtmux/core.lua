@@ -107,9 +107,13 @@ function M.create_autocmds()
   })
 
   -- Use CWD for tab name if custom name not already set
-  vim.api.nvim_create_autocmd('DirChanged', {
-    callback = u.auto_set_tab_name,
-    group = vim.api.nvim_create_augroup('nvtmux_dirchanged', {}),
+  -- NOTE: The DirChangedPre event is used instead of DirChanged in order capture the original
+  -- path before vim alters it by resolving symlinks.
+  vim.api.nvim_create_autocmd('DirChangedPre', {
+    callback = function(ev)
+      u.auto_set_tab_name(ev.file)
+    end,
+    group = vim.api.nvim_create_augroup('nvtmux_dirchangedpre', {}),
     pattern = '*',
   })
 end
