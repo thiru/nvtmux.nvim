@@ -17,6 +17,17 @@ end
 
 --- Set (subjectively) optimal settings for a good terminal experience.
 function M.set_term_opts()
+  if M.state.original_opts == nil then
+    M.state.original_opts = {
+      cursorline = vim.opt.cursorline,
+      number = vim.opt.number,
+      relativenumber = vim.opt.relativenumber,
+      scrolloff = vim.opt.scrolloff,
+      signcolumn = vim.opt.signcolumn,
+      title = vim.opt.title,
+    }
+  end
+
   vim.opt.cursorline = false
   vim.opt.scrolloff = 0
   vim.opt.number = false
@@ -24,9 +35,23 @@ function M.set_term_opts()
   vim.opt.signcolumn = 'no'
   vim.opt.title = true
 
-  if M.config.colorscheme ~= nil then
-    M.state.original_colors = vim.g.colors_name
+  if M.config.colorscheme and (vim.g.colors_name ~= M.config.colorscheme) then
+    M.state.original_opts.colors_name = vim.g.colors_name
     vim.cmd.colorscheme(M.config.colorscheme)
+  end
+end
+
+-- Undo options set in `M.set_term_opts`.
+function M.unset_term_opts()
+  vim.opt.cursorline = M.state.original_opts.cursorline
+  vim.opt.scrolloff = M.state.original_opts.scrolloff
+  vim.opt.number = M.state.original_opts.number
+  vim.opt.relativenumber = M.state.original_opts.relativenumber
+  vim.opt.signcolumn = M.state.original_opts.signcolumn
+  vim.opt.title = M.state.original_opts.title
+
+  if M.state.original_opts.colors_name then
+    vim.cmd.colorscheme(M.state.original_opts.colors_name)
   end
 end
 
@@ -42,12 +67,12 @@ function M.create_autocmds()
       -- When switching tabs ensure we're in terminal insert mode
       vim.schedule(function ()
         if u.is_terminal_buf() then
-          M.ensure_term_colors()
+          M.set_term_opts()
           if vim.fn.mode() ~= 't' then
             vim.cmd.startinsert()
           end
         else
-          M.ensure_non_term_colors()
+          M.unset_term_opts()
         end
       end)
     end,
@@ -116,20 +141,6 @@ function M.create_autocmds()
     group = vim.api.nvim_create_augroup('nvtmux_dirchangedpre', {}),
     pattern = '*',
   })
-end
-
---- Ensure the user-preferred terminal colorscheme is in use.
-function M.ensure_term_colors()
-  if M.config.colorscheme and (vim.g.colors_name ~= M.config.colorscheme) then
-    vim.cmd.colorscheme(M.config.colorscheme)
-  end
-end
-
---- Ensure the user's default colorscheme is in use.
-function M.ensure_non_term_colors()
-  if M.config.colorscheme and (vim.g.colors_name ~= M.state.original_colors) then
-    vim.cmd.colorscheme(M.state.original_colors)
-  end
 end
 
 --- Create a new tab with a terminal and enter insert mode.
