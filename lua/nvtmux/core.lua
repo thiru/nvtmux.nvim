@@ -125,7 +125,7 @@ function M.create_autocmds()
   vim.api.nvim_create_autocmd('TermLeave', {
     callback = function()
       vim.schedule(function()
-        if u.is_empty_tab() then
+        if M.state.is_term_tab and u.is_empty_tab() then
           local tabs = vim.api.nvim_list_tabpages()
           if #tabs == 1 then
             vim.cmd.quit()
