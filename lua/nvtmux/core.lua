@@ -71,6 +71,9 @@ function M.create_autocmds()
       -- When switching tabs ensure we're in terminal insert mode
       vim.schedule(function ()
         if u.is_terminal_buf() then
+          if M.config.on_tab_changed then
+            M.config.on_tab_changed(true)
+          end
           if not M.state.is_term_tab then
             M.set_term_opts()
           end
@@ -78,6 +81,9 @@ function M.create_autocmds()
             vim.cmd.startinsert()
           end
         else
+          if M.config.on_tab_changed then
+            M.config.on_tab_changed(false)
+          end
           if M.state.is_term_tab then
             M.unset_term_opts()
           end
