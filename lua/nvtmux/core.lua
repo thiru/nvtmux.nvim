@@ -283,16 +283,6 @@ function M.set_keybinds()
   -- New vertical split terminal
   vim.keymap.set(
     {'n', 't'},
-    '<C-S-t>',
-    function()
-      vim.cmd.vsplit()
-      vim.cmd.enew()
-      vim.cmd.terminal()
-      vim.cmd.startinsert()
-    end,
-    {desc = 'New terminal (vertical split)'})
-  vim.keymap.set(
-    {'n', 't'},
     M.config.leader .. 'v',
     function()
       vim.cmd.vsplit()
@@ -303,16 +293,6 @@ function M.set_keybinds()
     {desc = 'New terminal (vertical split)'})
 
   -- New horizontal split terminal
-  vim.keymap.set(
-    {'n', 't'},
-    '<C-S-h>',
-    function()
-      vim.cmd.split()
-      vim.cmd.enew()
-      vim.cmd.terminal()
-      vim.cmd.startinsert()
-    end,
-    {desc = 'New terminal (horizontal split)'})
   vim.keymap.set(
     {'n', 't'},
     M.config.leader .. 'h',
