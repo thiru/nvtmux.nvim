@@ -228,6 +228,10 @@ function M.set_keybinds()
   -- Terminal ESC
   vim.keymap.set('t', '<C-;>', '<C-\\><C-n>', {desc = 'Terminal mode -> normal mode'})
 
+  -- Up/down
+  vim.keymap.set('t', '<C-j>', '<Down>', {desc = 'Terminal mode -> down arrow'})
+  vim.keymap.set('t', '<C-k>', '<Up>', {desc = 'Terminal mode -> up arrow'})
+
   -- Paste
   vim.keymap.set('t', '<C-v>',
     function()
