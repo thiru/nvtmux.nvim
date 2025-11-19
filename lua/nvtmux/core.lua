@@ -10,9 +10,9 @@ local u = require('nvtmux.utils')
 ---@param config nvtmux.Config
 function M.setup(config)
   M.config = config
-  M.set_term_opts()
-  M.create_autocmds()
   M.set_keybinds()
+  M.create_usercmds()
+  M.create_autocmds()
 end
 
 --- Set (subjectively) optimal settings for a good terminal experience.
@@ -57,6 +57,15 @@ function M.unset_term_opts()
   end
 
   M.state.is_term_tab = false
+end
+
+--- Create user commands.
+function M.create_usercmds()
+  vim.api.nvim_create_user_command('NvtmuxStart', function()
+    M.set_term_opts()
+    vim.cmd.terminal()
+    vim.cmd.startinsert()
+  end, {})
 end
 
 --- Create various auto-commands to provide a more seamless experience such as:
