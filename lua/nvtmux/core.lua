@@ -264,9 +264,9 @@ function M.set_keybinds()
       {desc = 'Go to tab by index', silent=true})
   end
 
-  -- Last accessed tab
-  vim.keymap.set({'n', 't'}, '<C-`>', '<CMD>:tabnext #<CR>', {desc = 'Go to last accessed tab', silent = true})
-  vim.keymap.set({'n', 't'}, M.config.leader .. 'l', '<CMD>:tabnext #<CR>', {desc = 'Go to last accessed tab', silent = true})
+  -- Alternate tab
+  vim.keymap.set({'n', 't'}, '<C-`>', '<CMD>:tabnext #<CR>', {desc = 'Go to alternate tab', silent = true})
+  vim.keymap.set({'n', 't'}, M.config.leader .. 'a', '<CMD>:tabnext #<CR>', {desc = 'Go to alternate tab', silent = true})
 
   -- New terminal tab
   vim.keymap.set({'n', 't'}, '<C-t>', M.new_tab, {desc = 'New terminal (tab)'})
