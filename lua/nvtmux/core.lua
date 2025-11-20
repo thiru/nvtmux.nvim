@@ -10,24 +10,25 @@ local u = require('nvtmux.utils')
 ---@param config nvtmux.Config
 function M.setup(config)
   M.config = config
+  M.save_original_opts()
   M.set_keybinds()
   M.create_usercmds()
   M.create_autocmds()
 end
 
+function M.save_original_opts()
+  M.state.original_opts = {
+    cursorline = vim.opt.cursorline:get(),
+    number = vim.opt.number:get(),
+    relativenumber = vim.opt.relativenumber:get(),
+    scrolloff = vim.opt.scrolloff:get(),
+    signcolumn = vim.opt.signcolumn:get(),
+    title = vim.opt.title:get(),
+  }
+end
+
 --- Set (subjectively) optimal settings for a good terminal experience.
 function M.set_term_opts()
-  if M.state.original_opts == nil then
-    M.state.original_opts = {
-      cursorline = vim.opt.cursorline,
-      number = vim.opt.number,
-      relativenumber = vim.opt.relativenumber,
-      scrolloff = vim.opt.scrolloff,
-      signcolumn = vim.opt.signcolumn,
-      title = vim.opt.title,
-    }
-  end
-
   vim.opt.cursorline = false
   vim.opt.scrolloff = 0
   vim.opt.number = false
@@ -77,7 +78,6 @@ function M.create_autocmds()
     callback = function ()
       u.update_window_title()
 
-      -- When switching tabs ensure we're in terminal insert mode
       vim.schedule(function ()
         if u.is_terminal_buf() then
           if M.config.on_tab_changed then
@@ -86,6 +86,7 @@ function M.create_autocmds()
           if not M.state.is_term_tab then
             M.set_term_opts()
           end
+          -- When switching tabs ensure we're in terminal insert mode
           if vim.fn.mode() ~= 't' then
             vim.cmd.startinsert()
           end
