@@ -127,7 +127,10 @@ function M.create_autocmds()
             timer:stop()
             timer:close()
             vim.schedule(function()
-              vim.cmd.startinsert()
+              -- NOTE: ensure we're still in a terminal buffer
+              if u.is_terminal_buf() then
+                vim.cmd.startinsert()
+              end
             end)
           end)
         end
