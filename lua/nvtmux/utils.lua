@@ -17,16 +17,23 @@ end
 function M.get_tab_name(tab)
   tab = tab or vim.api.nvim_get_current_tabpage()
 
-  local ok, name = pcall(vim.api.nvim_tabpage_get_var, tab, 'tabname')
-  if ok then
-    return name
-  else
-    -- Fallback to the active buffer's filename
-    local win = vim.api.nvim_tabpage_get_win(tab)
-    local buf = vim.api.nvim_win_get_buf(win)
-    local bufname = vim.api.nvim_buf_get_name(buf)
-    return bufname:match("([^/\\]+)$") or "[No Name]"
+  -- Prefer a user-defined name if it exists
+  local tabname_ok, tabname = pcall(vim.api.nvim_tabpage_get_var, tab, 'tabname')
+  if tabname_ok then
+    return tabname
   end
+
+  -- Use the tab's CWD if it exists
+  local tabdir_ok, tabdir = pcall(vim.api.nvim_tabpage_get_var, 0, 'tabdir')
+  if tabdir_ok then
+    return tabdir
+  end
+
+  -- Finally, fallback to the active buffer's filename
+  local win = vim.api.nvim_tabpage_get_win(tab)
+  local buf = vim.api.nvim_win_get_buf(win)
+  local bufname = vim.api.nvim_buf_get_name(buf)
+  return bufname:match("([^/\\]+)$") or "[No Name]"
 end
 
 --- Set the current tab's name to what is given.

@@ -80,6 +80,11 @@ function M.create_autocmds()
 
       vim.schedule(function ()
         if u.is_terminal_buf() then
+          local ok, tabdir = pcall(vim.api.nvim_tabpage_get_var, 0, 'tabdir')
+          if ok then
+            vim.cmd('cd ' .. tabdir)
+          end
+
           if M.config.on_tab_changed then
             M.config.on_tab_changed(true)
           end

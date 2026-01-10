@@ -5,6 +5,7 @@ local M = {}
 local default_config = require('nvtmux.config')
 local core = require('nvtmux.core')
 local ssh = require('nvtmux.ssh')
+local u = require('nvtmux.utils')
 
 --- Setup and start plugin.
 ---
@@ -28,6 +29,14 @@ function M.setup(config)
   end
 
   return merged_config
+end
+
+--- Update the CWD of the current tab.
+---@param dir string The new CWD
+function M.update_cwd(dir)
+  vim.api.nvim_tabpage_set_var(0, 'tabdir', dir)
+  vim.cmd('cd ' .. dir)
+  vim.opt.titlestring = u.get_tab_name()
 end
 
 return M
