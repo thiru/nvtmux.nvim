@@ -283,12 +283,7 @@ function M.set_keybinds()
 
   -- New terminal tab
   vim.keymap.set('t', '<C-t>', M.new_tab, {desc = 'New terminal (tab)'})
-  vim.keymap.set({'n', 't'}, M.config.leader .. 't',
-    function()
-      M.new_tab()
-      M.rename_tab_prompt()
-    end,
-    {desc = 'New terminal (tab)'})
+  vim.keymap.set({'n', 't'}, M.config.leader .. 't', M.new_tab, {desc = 'New terminal (tab)'})
 
   -- Tab close
   vim.keymap.set('n', M.config.leader .. 'd', '<CMD>tabclose<CR>', {desc = 'Close tab'})
