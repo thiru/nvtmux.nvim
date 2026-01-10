@@ -180,6 +180,7 @@ function M.new_tab()
   vim.cmd('tabnew')
   vim.cmd.terminal()
   vim.cmd.startinsert()
+  u.auto_set_tab_name(vim.fn.getcwd())
 end
 
 --- Show prompt to rename the current tab.
