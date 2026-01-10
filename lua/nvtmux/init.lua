@@ -31,6 +31,16 @@ function M.setup(config)
   return merged_config
 end
 
+--- Set the git branch for the current tab.
+--- This would for example be done from an external process like a shell.
+function M.set_git_branch(branch)
+  if branch and #branch then
+    vim.api.nvim_tabpage_set_var(0, 'tabbranch', branch)
+  else
+    vim.api.nvim_tabpage_set_var(0, 'tabbranch', '')
+  end
+end
+
 --- Update the CWD of the current tab.
 ---@param dir string The new CWD
 function M.update_cwd(dir)
