@@ -288,8 +288,8 @@ function M.set_keybinds()
   vim.keymap.set({'n', 't'}, M.config.leader .. 'a', '<CMD>:tabnext #<CR>', {desc = 'Go to alternate tab', silent = true})
 
   -- New terminal tab
-  vim.keymap.set('t', '<C-t>', M.new_tab, {desc = 'New terminal (tab)'})
-  vim.keymap.set({'n', 't'}, M.config.leader .. 't', M.new_tab, {desc = 'New terminal (tab)'})
+  vim.keymap.set({'n', 'v', 't'}, '<C-S-t>', M.new_tab, {desc = 'New terminal (tab)'})
+  vim.keymap.set({'n', 'v', 't'}, M.config.leader .. 't', M.new_tab, {desc = 'New terminal (tab)'})
 
   -- Tab close
   vim.keymap.set('n', M.config.leader .. 'd', '<CMD>tabclose<CR>', {desc = 'Close tab'})
