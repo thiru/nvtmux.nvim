@@ -6,6 +6,8 @@ local M = {}
 ---@field auto_start boolean Automatically start terminal mode.
 ---@field colorscheme string? Optional colour scheme override. I find this useful as I prefer a light theme while editing and a dark theme for terminals.
 ---@field leader string A leader key is used for many key binds to avoid conflicting with nested vim instances. Tmux uses a similar approach with its default being CTRL-B.
+---@field on_before_term_created function? If specified, this function will be called right before a terminal is created in a new tab.
+---@field on_after_term_created function? If specified, this function will be called right after a terminal is created in a new tab.
 ---@field on_tab_changed function? If specified, this function will be called when the tab changes. It takes one parameter which indicates whether the current tab is a terminal mode tab.
 ---@field ssh.auto_reconnect boolean Automatically prompt to reconnect disconnected sessions
 ---@field ssh.auto_rename_tab boolean Automatically rename the current tab to the SSH connection name
@@ -16,6 +18,8 @@ M.config = {
   auto_start = false,
   colorscheme = nil,
   leader = '<C-space>',
+  on_before_term_created = nil,
+  on_after_term_created = nil,
   on_tab_changed = nil,
   ssh = {
     auto_reconnect = true,
