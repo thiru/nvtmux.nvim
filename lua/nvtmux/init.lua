@@ -25,7 +25,11 @@ function M.setup(config)
   end
 
   if vim.g.nvtmux_auto_start_cmd ~= nil and #vim.g.nvtmux_auto_start_cmd > 0 then
-    vim.fn.jobstart(vim.g.nvtmux_auto_start_cmd, {term = true})
+    u.with_timer(100, function()
+      vim.schedule(function()
+        vim.fn.feedkeys(vim.g.nvtmux_auto_start_cmd .. "\r\n")
+      end)
+    end)
   end
 
   return merged_config

@@ -126,19 +126,14 @@ function M.create_autocmds()
       -- Ensure we're in insert mode if we've come into another terminal buffer
       -- HACK: Not sure why I need to set `startinsert` in a timeout. It doesn't seem to work otherwise.
       if u.is_terminal_buf() then
-        local timer = vim.uv.new_timer()
-        if timer ~= nil then
-          timer:start(10, 0, function()
-            timer:stop()
-            timer:close()
-            vim.schedule(function()
-              -- NOTE: ensure we're still in a terminal buffer
-              if u.is_terminal_buf() then
-                vim.cmd.startinsert()
-              end
-            end)
+        u.with_timer(10, function()
+          vim.schedule(function()
+            -- NOTE: ensure we're still in a terminal buffer
+            if u.is_terminal_buf() then
+              vim.cmd.startinsert()
+            end
           end)
-        end
+        end)
       end
     end,
     group = vim.api.nvim_create_augroup('nvtmux_termclose', {}),

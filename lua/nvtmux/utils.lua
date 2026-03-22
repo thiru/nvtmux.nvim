@@ -2,7 +2,22 @@
 
 local M = {}
 
--- Get path with home directory replaced with tilde.
+--- Runs `func` after `timeout` milliseconds.
+---@param timeout number The timeout in milliseconds
+---@param func function The function to execute
+function M.with_timer(timeout, func)
+  local timer = vim.uv.new_timer()
+  if timer ~= nil then
+    timer:start(timeout, 0, function()
+      timer:stop()
+      timer:close()
+      func()
+    end)
+  end
+end
+
+--- Get path with home directory replaced with tilde.
+---@param path string The path
 function M.replace_home_with_tilde(path)
   local home_dir = vim.uv.os_homedir() or ''
   if vim.startswith(path, home_dir) then
