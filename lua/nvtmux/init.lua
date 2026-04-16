@@ -7,6 +7,8 @@ local core = require('nvtmux.core')
 local ssh = require('nvtmux.ssh')
 local u = require('nvtmux.utils')
 
+M.new_tab = core.new_tab
+
 --- Setup and start plugin.
 ---
 ---@param config nvtmux.Config? Custom user configuration
