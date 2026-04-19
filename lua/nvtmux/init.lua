@@ -48,12 +48,4 @@ function M.set_git_branch(branch)
   end
 end
 
---- Update the CWD of the current tab.
----@param dir string The new CWD
-function M.update_cwd(dir)
-  vim.api.nvim_tabpage_set_var(0, 'tabdir', dir)
-  vim.cmd('cd ' .. dir)
-  vim.opt.titlestring = u.get_tab_name()
-end
-
 return M
