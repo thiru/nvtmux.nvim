@@ -189,6 +189,27 @@ function M.new_tab()
   u.auto_set_tab_name(vim.fn.getcwd())
 end
 
+--- Create a centred, floating window with a terminal and enter insert mode.
+function M.new_float_term()
+  local width = vim.o.columns * 0.8
+  local height = vim.o.lines * 0.8
+  local row = (vim.o.lines - height) / 2
+  local col = (vim.o.columns - width) / 2
+
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_open_win(buf, true, {
+    relative = 'editor',
+    width = math.floor(width),
+    height = math.floor(height),
+    row = math.floor(row),
+    col = math.floor(col),
+    style = 'minimal',
+  })
+
+  vim.cmd.terminal()
+  vim.cmd.startinsert()
+end
+
 --- Show prompt to rename the current tab.
 function M.rename_tab_prompt()
   local curr_name = u.get_tab_name()
@@ -293,12 +314,15 @@ function M.set_keybinds()
   vim.keymap.set({'n', 't'}, '<C-`>', '<CMD>:tabnext #<CR>', {desc = 'Go to alternate tab', silent = true})
   vim.keymap.set({'n', 't'}, M.config.leader .. 'a', '<CMD>:tabnext #<CR>', {desc = 'Go to alternate tab', silent = true})
 
+  -- Tab close
+  vim.keymap.set('n', M.config.leader .. 'd', '<CMD>tabclose<CR>', {desc = 'Close tab'})
+
   -- New terminal tab
   vim.keymap.set({'n', 'v', 't'}, '<C-S-t>', M.new_tab, {desc = 'New terminal (tab)'})
   vim.keymap.set({'n', 'v', 't'}, M.config.leader .. 't', M.new_tab, {desc = 'New terminal (tab)'})
 
-  -- Tab close
-  vim.keymap.set('n', M.config.leader .. 'd', '<CMD>tabclose<CR>', {desc = 'Close tab'})
+  -- New floating, centred terminal
+  vim.keymap.set({'n', 'v', 't'}, M.config.leader .. 'f', M.new_float_term, {desc = 'New terminal (float)'})
 
   -- New vertical split terminal
   vim.keymap.set(

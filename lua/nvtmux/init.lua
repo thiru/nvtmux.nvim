@@ -8,6 +8,7 @@ local ssh = require('nvtmux.ssh')
 local u = require('nvtmux.utils')
 
 M.new_tab = core.new_tab
+M.new_float_term = core.new_float_term
 
 --- Setup and start plugin.
 ---
