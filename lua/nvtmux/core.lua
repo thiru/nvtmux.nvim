@@ -182,7 +182,7 @@ function M.create_autocmds()
         end
         vim.b[ev.buf].osc7_dir = dir
         if vim.api.nvim_get_current_buf() == ev.buf then
-          vim.cmd.lcd(dir)
+          vim.cmd.cd(dir)
           vim.api.nvim_tabpage_set_var(0, 'tabdir', dir)
           vim.opt.titlestring = u.get_tab_name()
         end
