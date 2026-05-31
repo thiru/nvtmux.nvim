@@ -71,7 +71,6 @@ end
 
 --- Create various auto-commands to provide a more seamless experience such as:
 --- - updating the OS window title to that of the current tab
---- - ensure we're in insert mode after switching to another tab
 --- - setting optimal terminal options or undoing them
 function M.create_autocmds()
   vim.api.nvim_create_autocmd('TabEnter', {
@@ -90,10 +89,6 @@ function M.create_autocmds()
           end
           if not M.state.is_term_tab then
             M.set_term_opts()
-          end
-          -- When switching tabs ensure we're in terminal insert mode
-          if vim.fn.mode() ~= 't' then
-            vim.cmd.startinsert()
           end
         else
           if M.config.on_tab_changed then
@@ -122,19 +117,6 @@ function M.create_autocmds()
     callback = function()
       -- Avoid "Process exited 0" message
       vim.api.nvim_input('<CR>')
-
-      -- Ensure we're in insert mode if we've come into another terminal buffer
-      -- HACK: Not sure why I need to set `startinsert` in a timeout. It doesn't seem to work otherwise.
-      if u.is_terminal_buf() then
-        u.with_timer(10, function()
-          vim.schedule(function()
-            -- NOTE: ensure we're still in a terminal buffer
-            if u.is_terminal_buf() then
-              vim.cmd.startinsert()
-            end
-          end)
-        end)
-      end
     end,
     group = vim.api.nvim_create_augroup('nvtmux_termclose', {}),
     pattern = '*',
