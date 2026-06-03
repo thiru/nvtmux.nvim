@@ -157,4 +157,44 @@ function M.auto_set_tab_name(path)
   end
 end
 
+--- Store the mode this tab is in.
+function M.save_tab_mode_and_coord()
+  local tab = vim.api.nvim_get_current_tabpage()
+  local mode = vim.fn.mode()
+  vim.api.nvim_tabpage_set_var(tab, 'lastmode', mode)
+
+  local coord = vim.api.nvim_win_get_cursor(0)
+  vim.api.nvim_tabpage_set_var(tab, 'lastline', coord[1])
+  vim.api.nvim_tabpage_set_var(tab, 'lastcol', coord[2])
+  -- vim.notify('nvtmux: saved tab ' .. tab .. ', mode=' .. mode .. ', coord=' .. coord[1] .. ',' .. coord[2]) -- DEBUG
+end
+
+function M.restore_tab_mode_and_coord()
+  local get_lastmode_ok, last_mode = pcall(vim.api.nvim_tabpage_get_var, 0, 'lastmode')
+
+  -- NOTE: no point in continuing if we don't have a mode stored
+  if not get_lastmode_ok then
+    return
+  end
+
+  local cur_mode = vim.fn.mode()
+
+  if last_mode == 't' and cur_mode ~= 't' then
+    vim.api.nvim_feedkeys('i', 'n', false)
+  elseif (last_mode == 'n' or last_mode == 'nt') and (cur_mode ~= 'n' or cur_mode ~= 'nt') then
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-\\><C-n>', true, false, true), 'n', false)
+
+    local last_line_ok, last_line = pcall(vim.api.nvim_tabpage_get_var, 0, 'lastline')
+    local last_col_ok, last_col = pcall(vim.api.nvim_tabpage_get_var, 0, 'lastcol')
+    if last_line_ok and last_col_ok then
+      vim.notify('restoring coord=' .. last_line .. ',' .. last_col)
+      vim.schedule(function()
+        vim.api.nvim_win_set_cursor(0, {last_line, last_col})
+      end)
+    else
+      vim.notify('nvtmux: last coords not found for current tab', vim.log.levels.ERROR)
+    end
+  end
+end
+
 return M

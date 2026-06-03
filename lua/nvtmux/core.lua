@@ -70,9 +70,27 @@ function M.create_usercmds()
 end
 
 --- Create various auto-commands to provide a more seamless experience such as:
---- - updating the OS window title to that of the current tab
---- - setting optimal terminal options or undoing them
 function M.create_autocmds()
+  -- NOTE: use these two autocmds to save and restore terminal tab mode & coord
+  vim.api.nvim_create_autocmd('WinLeave', {
+    callback = function()
+      if u.is_terminal_buf() then
+        u.save_tab_mode_and_coord()
+      end
+    end,
+    group = vim.api.nvim_create_augroup('nvtmux_winleave', {}),
+    pattern = '*',
+  })
+  vim.api.nvim_create_autocmd('WinEnter', {
+    callback = function()
+      if u.is_terminal_buf() then
+        u.restore_tab_mode_and_coord()
+      end
+    end,
+    group = vim.api.nvim_create_augroup('nvtmux_winenter', {}),
+    pattern = '*',
+  })
+
   vim.api.nvim_create_autocmd('TabEnter', {
     callback = function ()
       u.update_window_title()
