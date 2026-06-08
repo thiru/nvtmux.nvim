@@ -38,9 +38,6 @@ summary of the available options:
 
 ```lua
 {
-  -- Automatically start a terminal on setup (when Neovim opens).
-  auto_start = false,
-
   -- Optional colour scheme override. Useful if you prefer a different theme for terminals
   -- (e.g. a dark theme while using a light theme for editing).
   colorscheme = nil,
@@ -92,9 +89,6 @@ start-up like so:
 nvim +NvtmuxStart
 ```
 
-If you set `auto_start = true` in your config, a terminal will be created automatically when
-Neovim starts.
-
 As in tmux, nvtmux uses a leader key for many of its commands so that they don't conflict with
 possibly nested vim instances. By default this is set to `<C-;>` (configurable via the `leader`
 option).
@@ -114,9 +108,6 @@ option).
 | `<leader>d`  | Close current tab                                |
 | `<leader>w`  | Set a window prefix (shown in the title)         |
 | `<leader>q`  | Safe quit (confirms if multiple terminals open)  |
-
-> **Note:** `<leader>` defaults to `<C-;>`. If you set a different leader, all leader-based
-> bindings use that key as the prefix.
 
 ### Non-leader key bindings
 

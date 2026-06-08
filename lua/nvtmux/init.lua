@@ -21,12 +21,6 @@ function M.setup(config)
   core.setup(merged_config)
   ssh.setup(merged_config)
 
-  if merged_config.auto_start then
-    core.set_term_opts()
-    vim.cmd.terminal()
-    vim.cmd.startinsert()
-  end
-
   if vim.g.nvtmux_auto_start_cmd ~= nil and #vim.g.nvtmux_auto_start_cmd > 0 then
     u.with_timer(100, function()
       vim.schedule(function()
