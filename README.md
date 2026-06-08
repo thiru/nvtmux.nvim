@@ -1,14 +1,14 @@
 # nvtmux
 
-**_NOTE:_ This plugin is alpha quality and probably not ready for public consumption.**
+> **Note:** This plugin is still in the experimental phase and may make breaking changes.
 
-nvtmux is short for Neovim terminal multiplexor.
+nvtmux is short for NeoVim Terminal MUltipleXor.
 
 ## Rationale
 
 I use the terminal a lot and I want to have the full power of vim at my disposal to navigate its
-contents. Even the most popular terminal apps (e.g. Alacritty, Kitty, Wezterm) have a fraction of
-the capabilities of vim when it comes to navigating text. So, I use Neovim's terminal emulator.
+contents. Even the most popular terminal apps (e.g. Ghostty, Kitty) have a fraction of the
+capabilities of vim when it comes to navigating text. So, I use Neovim's terminal emulator.
 
 I also like the multiplexing capabilities of tools like tmux, such as tabs and windows. Vim also
 has these capabilities but the out-of-the-box experience is not at all ergonomic when used in
@@ -22,9 +22,8 @@ Minimal lazy.nvim config:
 {
   'thiru/nvtmux.nvim',
 
-  depedencies = {
-    'nvim-lualine/lualine.nvim', -- (optional) Has a nice tabline
-    'nvim-telescope/telescope.nvim' -- (optional) Used by the SSH connection picker
+  dependencies = {
+    'nvim-telescope/telescope.nvim', -- (optional) Used by the SSH connection picker
   },
 
   ---@type nvtmux.Config
@@ -34,7 +33,53 @@ Minimal lazy.nvim config:
 
 ## Configuration
 
-See [config.lua](./lua/nvtmux/config.lua) for details on the configuration.
+See [config.lua](./lua/nvtmux/config.lua) for the full configuration with defaults. Below is a
+summary of the available options:
+
+```lua
+{
+  -- Automatically start a terminal on setup (when Neovim opens).
+  auto_start = false,
+
+  -- Optional colour scheme override. Useful if you prefer a different theme for terminals
+  -- (e.g. a dark theme while using a light theme for editing).
+  colorscheme = nil,
+
+  -- The "leader" key used for many key binds (see keymap tables below).
+  -- This avoids conflicts with nested vim instances (similar to tmux's Ctrl-B).
+  leader = '<C-;>',
+
+  -- Callback invoked right before a terminal buffer is created.
+  on_before_term_created = nil,
+
+  -- Callback invoked right after a terminal buffer is created.
+  on_after_term_created = nil,
+
+  -- Callback invoked on tab change. Receives a boolean indicating whether the
+  -- newly entered tab is a terminal tab.
+  on_tab_changed = nil,
+
+  ssh = {
+    -- Automatically reconnect SSH sessions when they disconnect. A wrapper
+    -- script loops and prompts the user to reconnect.
+    auto_reconnect = true,
+
+    -- Automatically rename the tab to the SSH hostname when connecting.
+    auto_rename_tab = true,
+
+    password_detection = {
+      -- Attempt to detect SSH password prompts and cache entered passwords.
+      enabled = true,
+
+      -- Lua patterns used to detect an SSH authentication request.
+      patterns = {
+        'password:$',
+        '^Enter passphrase for key.*:$',
+      },
+    },
+  },
+}
+```
 
 ## Usage
 
@@ -47,61 +92,126 @@ start-up like so:
 nvim +NvtmuxStart
 ```
 
-As in tmux, nvtmux uses a prefix for many of its commands so that they don't conflict with possibly
-nested vim instances. By default this is set to `<C-space>`.
+If you set `auto_start = true` in your config, a terminal will be created automatically when
+Neovim starts.
 
-| Keymap       | Description                                    |
-|--------------|------------------------------------------------|
-| `<C-space>t` | New terminal (tab)                             |
-| `<C-space>v` | New terminal (vertical split)                  |
-| `<C-space>h` | New terminal (horizontal split)                |
-| `<C-space>r` | Rename current tab                             |
-| `<C-space>p` | Paste from system clipboard                    |
-| `<C-space>l` | Go to last accessed tab                        |
-| `<C-space>s` | Launch SSH connection picker                   |
-| `<C-space>q` | Safe quit (confirm if multiple terminals open) |
+As in tmux, nvtmux uses a leader key for many of its commands so that they don't conflict with
+possibly nested vim instances. By default this is set to `<C-;>` (configurable via the `leader`
+option).
 
-Non-leader key bindings:
+### Leader key bindings
 
-| Keymap       | Description                                    |
-|--------------|------------------------------------------------|
-| `<C-;>`      | Escape terminal mode                           |
-| `<C-t>`      | New terminal (tab)                             |
-| `<C-S-t>`    | New terminal (vertical split)                  |
-| `<C-S-h>`    | New terminal (horizontal split)                |
-| `<C-S-r>`    | Rename current tab                             |
-| `<C-v>`      | Paste from system clipboard                    |
-| `<C-TAB>`    | Next tab                                       |
-| `<C-S-k>`    | Next tab                                       |
-| `<C-S-TAB>`  | Previous tab                                   |
-| `<C-S-j>`    | Previous tab                                   |
-| `<C-[NUM]>`  | Go to the specified numbered tab               |
-| `<C-tilde>`  | Go to last accessed tab                        |
-| `<C-,>`      | Move current tab to the left                   |
-| `<C-.>`      | Move current tab to the right                  |
+| Keymap       | Description                                      |
+|--------------|--------------------------------------------------|
+| `<leader>t`  | New terminal (tab)                               |
+| `<leader>f`  | New floating, centred terminal                   |
+| `<leader>v`  | New terminal (vertical split)                    |
+| `<leader>h`  | New terminal (horizontal split)                  |
+| `<leader>r`  | Rename current tab                               |
+| `<leader>p`  | Paste from system clipboard                      |
+| `<leader>a`  | Go to alternate (last accessed) tab              |
+| `<leader>s`  | Launch SSH connection picker                     |
+| `<leader>d`  | Close current tab                                |
+| `<leader>w`  | Set a window prefix (shown in the title)         |
+| `<leader>q`  | Safe quit (confirms if multiple terminals open)  |
+
+> **Note:** `<leader>` defaults to `<C-;>`. If you set a different leader, all leader-based
+> bindings use that key as the prefix.
+
+### Non-leader key bindings
+
+| Keymap         | Description                                      |
+|----------------|--------------------------------------------------|
+| `<C-space>`    | Escape terminal mode (back to Normal mode)       |
+| `<C-j>`        | Terminal mode: Send Down arrow                   |
+| `<C-k>`        | Terminal mode: Send Up arrow                     |
+| `<C-S-t>`      | New terminal (tab)                               |
+| `<C-S-r>`      | Rename current tab                               |
+| `<C-v>`        | Paste from system clipboard                      |
+| `<C-TAB>`      | Next tab                                         |
+| `<C-S-TAB>`    | Previous tab                                     |
+| `<C-S-k>`      | Next tab (alternative)                           |
+| `<C-S-j>`      | Previous tab (alternative)                       |
+| `<C-[1-9]>`    | Go to the specified numbered tab                 |
+| `<C-\`>`       | Go to alternate (last accessed) tab              |
+| `<C-,>`        | Move current tab to the left                     |
+| `<C-.>`        | Move current tab to the right                    |
 
 **Auto-Start Command**
 
-It's also possible to specify a command to run when the terminal starts like so:
+It's also possible to specify a command to run when the terminal starts via a global variable:
 
 ```shell
 nvim +NvtmuxStart --cmd 'lua vim.g.nvtmux_auto_start_cmd = "htop"'
 ```
 
+## Features
+
+### Automatic tab naming
+
+Tabs are automatically named after their current working directory. If a terminal's directory
+changes (via `cd` or OSC 7 escape sequences), the tab name updates accordingly.
+
+If you manually rename a tab (e.g. via  `<C-S-r>`), the automatic naming is disabled for that tab
+and your custom name is preserved.
+
+### Window title
+
+The window/tab title is composed from an optional window prefix (set via `<leader>w`) and the
+tab name itself. This prefix can be used to group related terminals, analogous to tmux windows.
+
+### Floating terminal
+
+A centred, floating terminal window can be opened with `<leader>f`. This is useful for quick
+commands without leaving your current layout.
+
+### OSC 7 directory change support
+
+The plugin handles OSC 7 escape sequences (emitted by modern shells via
+[`osc7`](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/osc7) or similar) to track
+directory changes inside the terminal. The tab name and CWD are updated automatically.
+
+### Auto-close empty tabs
+
+When you exit a shell in a terminal tab (TermLeave), the tab is automatically closed if it's
+empty. If it's the last tab, Neovim quits entirely.
+
+### Tab mode and cursor position preservation
+
+The plugin saves and restores the mode (terminal Insert or Normal) and cursor position when
+switching between windows in a tab, so you don't lose your place.
+
 ### SSH Connection Picker
 
-To start the Telescope SSH connection picker use the keymap defined above or run:
+The built-in SSH picker uses Telescope to parse `~/.ssh/config` and `~/.ssh/known_hosts` and
+lets you quickly connect to any host via a Neovim terminal.
+
+Start the picker with `<leader>s` or by running:
 
 ```vim
 :SshPicker
 ```
 
-All actions will start an instance of Neovim's terminal emulator. The default action (`<CR>`)
-will use the current buffer. You can also use Telescope's alternative actions to open the SSH
-connection in a new:
+The default action (`<CR>`) will replace the current buffer. Telescope's alternative actions let
+you open the connection in a:
 
-- tab (`<C-t>`)
-- horizontal split (`<C-x>`)
-- vertical split (`<C-v>`)
+- **new tab** (`<C-t>`)
+- **horizontal split** (`<C-x>`)
+- **vertical split** (`<C-v>`)
 
-Note, the above bindings are Telescope defaults. You can change these in your Telescope config.
+> **Note:** The above alternative action bindings are Telescope defaults. You can change them
+> in your Telescope config.
+
+#### Auto-reconnect
+
+When `ssh.auto_reconnect` is enabled (default: `true`), the SSH session is wrapped in a loop
+that prompts you to press ENTER to reconnect after the session ends.
+
+#### Password detection & caching
+
+When `ssh.password_detection.enabled` is `true` (default), the plugin monitors terminal output
+for SSH password prompts (using the configured Lua patterns). When a prompt is detected:
+
+1. A `inputsecret()` prompt appears for the password.
+2. The password is cached in memory keyed by hostname.
+3. On subsequent connections to the same host, the cached password is pre-filled.
