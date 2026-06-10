@@ -91,6 +91,14 @@ function M.create_autocmds()
     pattern = '*',
   })
 
+  vim.api.nvim_create_autocmd('BufEnter', {
+    callback = function()
+      u.update_window_title()
+    end,
+    group = vim.api.nvim_create_augroup('nvtmux_bufenter', {}),
+    pattern = '*',
+  })
+
   vim.api.nvim_create_autocmd('TabEnter', {
     callback = function ()
       u.update_window_title()
@@ -164,6 +172,7 @@ function M.create_autocmds()
   vim.api.nvim_create_autocmd('DirChangedPre', {
     callback = function(ev)
       u.auto_set_tab_name(ev.file)
+      u.update_window_title()
     end,
     group = vim.api.nvim_create_augroup('nvtmux_dirchangedpre', {}),
     pattern = '*',
@@ -184,7 +193,7 @@ function M.create_autocmds()
         if vim.api.nvim_get_current_buf() == ev.buf then
           vim.cmd.cd(dir)
           vim.api.nvim_tabpage_set_var(0, 'tabdir', dir)
-          vim.opt.titlestring = u.get_tab_name()
+          u.update_window_title()
         end
       end
     end

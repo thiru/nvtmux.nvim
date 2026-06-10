@@ -152,7 +152,8 @@ function M.auto_set_tab_name(path)
   end
 
   if vim.bo[vim.api.nvim_get_current_buf()].buftype == 'terminal' then
-    local name = M.replace_home_with_tilde(path)
+    local resolved = vim.fn.fnamemodify(path, ':p')
+    local name = M.replace_home_with_tilde(resolved)
     vim.api.nvim_tabpage_set_var(tab, 'tabname', name)
   end
 end
