@@ -188,7 +188,7 @@ function M.restore_tab_mode_and_coord()
     local last_line_ok, last_line = pcall(vim.api.nvim_tabpage_get_var, 0, 'lastline')
     local last_col_ok, last_col = pcall(vim.api.nvim_tabpage_get_var, 0, 'lastcol')
     if last_line_ok and last_col_ok then
-      vim.notify('restoring coord=' .. last_line .. ',' .. last_col)
+      -- vim.notify('restoring coord=' .. last_line .. ',' .. last_col) -- DEBUG
       vim.schedule(function()
         vim.api.nvim_win_set_cursor(0, {last_line, last_col})
       end)
