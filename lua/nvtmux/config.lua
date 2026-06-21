@@ -13,6 +13,7 @@ local M = {}
 ---@field ssh.password_detection table? Attempt to detect SSH authentication requests. Passwords will be cached and reused for future connections.
 ---@field ssh.password_detection.enabled boolean Enable SSH authentication request detection.
 ---@field ssh.password_detection.patterns string[] Lua patterns used to detect an SSH authentication request
+---@field ssh.picker string Select the picker backend: 'auto' (try telescope first, fallback to fzf-lua), 'telescope', or 'fzf-lua'
 M.config = {
   colorscheme = nil,
   leader = '<C-;>',
@@ -28,7 +29,8 @@ M.config = {
         'password:$',
         '^Enter passphrase for key.*:$'
       },
-    }
+    },
+    picker = 'auto'
   }
 }
 

@@ -1,4 +1,4 @@
---- Telescope-based interface for picking SSH connections.
+--- SSH module for connecting to remote hosts.
 
 local M = {}
 

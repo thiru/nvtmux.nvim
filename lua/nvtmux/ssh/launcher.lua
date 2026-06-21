@@ -27,7 +27,7 @@ M.state = {
 M.setup = function(config)
   M.config = config.ssh
   M.create_user_commands()
-  picker.setup(M.open_ssh_terminal)
+  picker.setup(config.ssh, M.open_ssh_terminal)
 end
 
 --- Create user command to facilitate SSH password injection.

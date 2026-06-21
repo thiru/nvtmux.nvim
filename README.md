@@ -23,7 +23,9 @@ Minimal lazy.nvim config:
   'thiru/nvtmux.nvim',
 
   dependencies = {
-    'nvim-telescope/telescope.nvim', -- (optional) Used by the SSH connection picker
+     -- NOTE: these are not required unless you want to use the SSH picker and only one is needed
+    'nvim-telescope/telescope.nvim',
+    'ibhagwan/fzf-lua',
   },
 
   ---@type nvtmux.Config
@@ -74,6 +76,9 @@ summary of the available options:
         '^Enter passphrase for key.*:$',
       },
     },
+
+    -- Picker backend: 'auto' (try telescope first, then fzf-lua), 'telescope', or 'fzf-lua'
+    picker = 'auto',
   },
 }
 ```
@@ -174,8 +179,8 @@ switching between windows in a tab, so you don't lose your place.
 
 ### SSH Connection Picker
 
-The built-in SSH picker uses Telescope to parse `~/.ssh/config` and `~/.ssh/known_hosts` and
-lets you quickly connect to any host via a Neovim terminal.
+The built-in SSH picker parses `~/.ssh/config` and `~/.ssh/known_hosts` and lets you quickly
+connect to any host via a Neovim terminal. It supports **telescope.nvim** and **fzf-lua**.
 
 Start the picker with `<leader>s` or by running:
 
@@ -183,15 +188,23 @@ Start the picker with `<leader>s` or by running:
 :SshPicker
 ```
 
-The default action (`<CR>`) will replace the current buffer. Telescope's alternative actions let
-you open the connection in a:
+By default the picker auto-detects which backend is installed (telescope preferred), or you can
+force one by setting `ssh.picker` in your config:
+
+```lua
+opts = {
+  ssh = {
+    picker = 'fzf-lua', -- or 'telescope' (default: 'auto')
+  },
+}
+```
+
+The default action (`<CR>`) will replace the current buffer. Alternative actions let you open the
+connection in a:
 
 - **new tab** (`<C-t>`)
-- **horizontal split** (`<C-x>`)
+- **horizontal split** (`<C-s>`)
 - **vertical split** (`<C-v>`)
-
-> **Note:** The above alternative action bindings are Telescope defaults. You can change them
-> in your Telescope config.
 
 #### Auto-reconnect
 
