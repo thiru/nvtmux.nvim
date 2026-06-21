@@ -78,7 +78,7 @@ function M.create_autocmds()
         u.save_tab_mode_and_coord()
       end
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_winleave', {}),
+    group = vim.api.nvim_create_augroup('nvtmux_winleave', {clear = true}),
     pattern = '*',
   })
   vim.api.nvim_create_autocmd('WinEnter', {
@@ -87,7 +87,7 @@ function M.create_autocmds()
         u.restore_tab_mode_and_coord()
       end
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_winenter', {}),
+    group = vim.api.nvim_create_augroup('nvtmux_winenter', {clear = true}),
     pattern = '*',
   })
 
@@ -95,7 +95,7 @@ function M.create_autocmds()
     callback = function()
       u.update_window_title()
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_bufenter', {}),
+    group = vim.api.nvim_create_augroup('nvtmux_bufenter', {clear = true}),
     pattern = '*',
   })
 
@@ -135,7 +135,7 @@ function M.create_autocmds()
     callback = function()
       vim.opt_local.modifiable = true
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_termopen', {}),
+    group = vim.api.nvim_create_augroup('nvtmux_termopen', {clear = true}),
     pattern = '*',
   })
 
@@ -144,7 +144,7 @@ function M.create_autocmds()
       -- Avoid "Process exited 0" message
       vim.api.nvim_input('<CR>')
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_termclose', {}),
+    group = vim.api.nvim_create_augroup('nvtmux_termclose', {clear = true}),
     pattern = '*',
   })
 
@@ -162,7 +162,7 @@ function M.create_autocmds()
         end
       end)
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_termleave', {}),
+    group = vim.api.nvim_create_augroup('nvtmux_termleave', {clear = true}),
     pattern = '*',
   })
 
@@ -174,7 +174,7 @@ function M.create_autocmds()
       u.auto_set_tab_name(ev.file)
       u.update_window_title()
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_dirchangedpre', {}),
+    group = vim.api.nvim_create_augroup('nvtmux_dirchangedpre', {clear = true}),
     pattern = '*',
   })
 
