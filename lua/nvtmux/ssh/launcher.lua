@@ -115,15 +115,12 @@ M.open_ssh_terminal = function(target)
 
   -- Prompt to replace current buffer with terminal
   if target == 'this' then
-    local confirm = vim.fn.input('Wipe out the current buffer and connect to ' .. host .. '? ', 'yes')
-    if vim.trim(confirm) ~= 'yes' then
-      vim.schedule(function()
-        vim.cmd.startinsert()
-      end)
+    local choice = vim.fn.confirm('Wipe out the current buffer and connect to ' .. host .. '?', '&Yes\n&No')
+    if choice ~= 1 then
       return
     else
-      -- Need this to overwrite existing, modified buffer with a new terminal session
       vim.api.nvim_set_option_value('modified', false, {buf=vim.api.nvim_get_current_buf()})
+      vim.cmd.enew()
     end
   -- Start terminal in a new tab
   elseif target == 'tab' then
