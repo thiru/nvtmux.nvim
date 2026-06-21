@@ -196,7 +196,8 @@ function M.create_autocmds()
           u.update_window_title()
         end
       end
-    end
+    end,
+    group = vim.api.nvim_create_augroup('nvtmux_termrequest', {clear = true})
   })
 end
 
