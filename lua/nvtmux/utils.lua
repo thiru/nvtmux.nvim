@@ -89,8 +89,8 @@ end
 ---@param b string
 ---@return boolean diff
 function M.sort_alpha_before_number(a, b)
-  local a_is_alphabetic = string.match(a, "%a.*")
-  local b_is_alphabetic = string.match(b, "%a.*")
+  local a_is_alphabetic = string.match(a, "^%a")
+  local b_is_alphabetic = string.match(b, "^%a")
 
   if a_is_alphabetic and not b_is_alphabetic then
     return true
