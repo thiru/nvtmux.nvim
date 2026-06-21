@@ -74,32 +74,34 @@ M.get_ssh_cmd = function(host, bufnr)
   return cmd
 end
 
---- Reads each line of stdout of the terminal in order to prompt and inject SSH passwords.
---- The parameters are the same as `vim.fn.jobstart`.
-M.on_term_stdout = function(chan_id, data, _)
-  local bufnr = vim.api.nvim_get_current_buf()
+--- Create a stdout callback for a specific terminal buffer.
+--- Reads each line of stdout to prompt and inject SSH passwords.
+---@param bufnr number The buffer number to track
+---@return fun(chan_id: number, data: string[], name: string)
+M.create_stdout_callback = function(bufnr)
+  return function(chan_id, data, _)
+    local buffer_cache = M.state.buffers[bufnr]
+    if buffer_cache == nil then
+      return
+    end
 
-  local buffer_cache = M.state.buffers[bufnr]
-  if buffer_cache == nil then
-    return
-  end
+    local cached_pwd = (M.state.pwds[buffer_cache.host] or '')
+    local max_stdout_lines_read = buffer_cache.stdout_line_count >= max_lines_detect
 
-  local cached_pwd = (M.state.pwds[buffer_cache.host] or '')
-  local max_stdout_lines_read = buffer_cache.stdout_line_count >= max_lines_detect
-
-  if (buffer_cache.reinject or (not max_stdout_lines_read)) then
-    for _, line in ipairs(data) do
-      line = vim.trim(line)
-      buffer_cache.stdout_line_count = buffer_cache.stdout_line_count + 1
-      for _, pattern in ipairs(M.config.password_detection.patterns) do
-        if (line:find(pattern)) then
-          local msg = 'Enter password for ' .. buffer_cache.host .. ': '
-          cached_pwd = (vim.fn.inputsecret(msg, cached_pwd) or '')
-          if #cached_pwd > 0 then
-            M.state.pwds[buffer_cache.host] = cached_pwd
-            vim.fn.chansend(chan_id, cached_pwd .. '\n')
+    if (buffer_cache.reinject or (not max_stdout_lines_read)) then
+      for _, line in ipairs(data) do
+        line = vim.trim(line)
+        buffer_cache.stdout_line_count = buffer_cache.stdout_line_count + 1
+        for _, pattern in ipairs(M.config.password_detection.patterns) do
+          if (line:find(pattern)) then
+            local msg = 'Enter password for ' .. buffer_cache.host .. ': '
+            cached_pwd = (vim.fn.inputsecret(msg, cached_pwd) or '')
+            if #cached_pwd > 0 then
+              M.state.pwds[buffer_cache.host] = cached_pwd
+              vim.fn.chansend(chan_id, cached_pwd .. '\n')
+            end
+            break
           end
-          break
         end
       end
     end
@@ -147,7 +149,7 @@ M.open_ssh_terminal = function(target)
       -- Count stdout lines processed so we don't keep trying to detect an SSH password prompt for too long
       stdout_line_count = 0}
 
-    job_opts.on_stdout = M.on_term_stdout
+    job_opts.on_stdout = M.create_stdout_callback(bufnr)
   end
 
   vim.fn.jobstart(cmd, job_opts)
