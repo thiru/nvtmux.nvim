@@ -183,7 +183,7 @@ function M.restore_tab_mode_and_coord()
 
   if last_mode == 't' and cur_mode ~= 't' then
     vim.api.nvim_feedkeys('i', 'n', false)
-  elseif (last_mode == 'n' or last_mode == 'nt') and (cur_mode ~= 'n' or cur_mode ~= 'nt') then
+  elseif (last_mode == 'n' or last_mode == 'nt') and cur_mode ~= 'n' and cur_mode ~= 'nt' then
     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-\\><C-n>', true, false, true), 'n', false)
 
     local last_line_ok, last_line = pcall(vim.api.nvim_tabpage_get_var, 0, 'lastline')
