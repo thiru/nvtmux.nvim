@@ -280,7 +280,7 @@ end
 ---@param num number
 function M.go_to_tab(num)
   local tab_handles = vim.api.nvim_list_tabpages()
-  if (#tab_handles > 1) and (num <= #tab_handles) then
+  if (num > 0) and (#tab_handles > 1) and (num <= #tab_handles) then
     vim.api.nvim_set_current_tabpage(tab_handles[num])
   end
 end
