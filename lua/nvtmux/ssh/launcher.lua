@@ -138,17 +138,19 @@ M.open_ssh_terminal = function(target)
   vim.notify('Connecting to ' .. host, vim.log.levels.INFO)
 
   -- Start a Neovim terminal
-  if not M.config.password_detection.enabled then
-    vim.fn.jobstart(cmd)
-  else
+  local job_opts = {term = true}
+
+  if M.config.password_detection.enabled then
     M.state.buffers[bufnr] = {
       host = host,
       reinject = false,
       -- Count stdout lines processed so we don't keep trying to detect an SSH password prompt for too long
       stdout_line_count = 0}
 
-    vim.fn.jobstart(cmd, {term = true, on_stdout = M.on_term_stdout})
+    job_opts.on_stdout = M.on_term_stdout
   end
+
+  vim.fn.jobstart(cmd, job_opts)
 
   if (M.config.auto_rename_tab) then
     u.set_tab_name(host)
