@@ -39,7 +39,7 @@ function M.get_tab_name(tab)
   end
 
   -- Use the tab's CWD if it exists
-  local tabdir_ok, tabdir = pcall(vim.api.nvim_tabpage_get_var, 0, 'tabdir')
+  local tabdir_ok, tabdir = pcall(vim.api.nvim_tabpage_get_var, tab, 'tabdir')
   if tabdir_ok then
     return tabdir
   end
