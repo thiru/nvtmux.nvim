@@ -20,6 +20,7 @@ function M.save_original_opts()
   M.state.original_opts = {
     background = vim.opt.background:get(),
     cursorline = vim.opt.cursorline:get(),
+    neovide_opacity = vim.g.neovide_opacity,
     number = vim.opt.number:get(),
     relativenumber = vim.opt.relativenumber:get(),
     scrolloff = vim.opt.scrolloff:get(),
@@ -113,6 +114,12 @@ function M.create_autocmds()
             vim.fn.chdir(tabdir)
           end
 
+          if M.config.neovide_opacity
+              and vim.g.neovide
+              and vim.g.neovide_opacity ~= M.config.neovide_opacity then
+            vim.g.neovide_opacity = M.config.neovide_opacity
+          end
+
           if M.config.on_tab_changed then
             M.config.on_tab_changed(true)
           end
@@ -120,6 +127,12 @@ function M.create_autocmds()
             M.set_term_opts()
           end
         else
+          if M.config.neovide_opacity
+              and vim.g.neovide
+              and vim.g.neovide_opacity ~= M.state.original_opts.neovide_opacity then
+            vim.g.neovide_opacity = M.state.original_opts.neovide_opacity
+          end
+
           if M.config.on_tab_changed then
             M.config.on_tab_changed(false)
           end
