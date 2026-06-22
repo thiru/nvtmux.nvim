@@ -302,21 +302,23 @@ end
 
 --- Define key bindings. These are mostly leader-key-based.
 function M.set_keybinds()
+  -- New terminal tab
+  vim.keymap.set({'n', 'v', 't'}, '<C-T>', M.new_tab, {desc = 'New terminal (tab)'})
+  vim.keymap.set({'n', 'v', 't'}, M.config.leader .. 't', M.new_tab, {desc = 'New terminal (tab)'})
+
+  -- New floating, centred terminal
+  vim.keymap.set('n', '<leader>f', M.new_float_term, {desc = 'New terminal (float)'})
+  vim.keymap.set({'n', 'v', 't'}, M.config.leader .. 'f', M.new_float_term, {desc = 'New terminal (float)'})
+
   -- Terminal ESC
   vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', {desc = 'Terminal mode -> normal mode'})
 
   -- Up/down
-  vim.keymap.set('t', '<C-j>', '<Down>', {desc = 'Terminal mode -> down arrow'})
-  vim.keymap.set('t', '<C-k>', '<Up>', {desc = 'Terminal mode -> up arrow'})
+  vim.keymap.set('t', '<C-n>', '<Down>', {desc = 'Terminal mode -> down arrow'})
+  vim.keymap.set('t', '<C-p>', '<Up>', {desc = 'Terminal mode -> up arrow'})
 
   -- Paste
   vim.keymap.set('t', '<C-v>',
-    function()
-      local terminal_job_id = vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')
-      vim.api.nvim_chan_send(terminal_job_id, vim.fn.getreg('+'))
-    end,
-    {desc = 'Paste from system clipboard'})
-  vim.keymap.set('t', M.config.leader .. 'p',
     function()
       local terminal_job_id = vim.fn.getbufvar(vim.fn.bufnr(), 'terminal_job_id')
       vim.api.nvim_chan_send(terminal_job_id, vim.fn.getreg('+'))
@@ -327,10 +329,8 @@ function M.set_keybinds()
   vim.keymap.set({'n', 't'}, M.config.leader .. 'q', M.safe_quit, {desc = 'Quit (confirm if multiple terms open)'})
 
   -- Previous/next tab
-  vim.keymap.set({'n', 't'}, '<C-S-TAB>', '<CMD>tabprevious<CR>', {desc = 'Previous tab', silent = true})
-  vim.keymap.set({'n', 't'}, '<C-TAB>', '<CMD>tabnext<CR>', {desc = 'Next tab', silent = true})
-  vim.keymap.set({'n', 't'}, '<C-S-j>', '<CMD>tabprevious<CR>', {desc = 'Previous tab', silent = true})
-  vim.keymap.set({'n', 't'}, '<C-S-k>', '<CMD>tabnext<CR>', {desc = 'Next tab', silent = true})
+  vim.keymap.set({'n', 't'}, '<C-j>', '<CMD>tabprevious<CR>', {desc = 'Previous tab', silent = true})
+  vim.keymap.set({'n', 't'}, '<C-k>', '<CMD>tabnext<CR>', {desc = 'Next tab', silent = true})
 
   -- Go to tab by index
   for i=1,9 do
@@ -342,18 +342,10 @@ function M.set_keybinds()
   end
 
   -- Alternate tab
-  vim.keymap.set({'n', 't'}, '<C-`>', '<CMD>:tabnext #<CR>', {desc = 'Go to alternate tab', silent = true})
-  vim.keymap.set({'n', 't'}, M.config.leader .. 'a', '<CMD>:tabnext #<CR>', {desc = 'Go to alternate tab', silent = true})
+  vim.keymap.set({'n', 't'}, '<C-TAB>', '<CMD>:tabnext #<CR>', {desc = 'Go to alternate tab', silent = true})
 
   -- Tab close
   vim.keymap.set({'n', 't'}, M.config.leader .. 'd', '<CMD>tabclose<CR>', {desc = 'Close tab'})
-
-  -- New terminal tab
-  vim.keymap.set({'n', 'v', 't'}, '<C-S-t>', M.new_tab, {desc = 'New terminal (tab)'})
-  vim.keymap.set({'n', 'v', 't'}, M.config.leader .. 't', M.new_tab, {desc = 'New terminal (tab)'})
-
-  -- New floating, centred terminal
-  vim.keymap.set({'n', 'v', 't'}, M.config.leader .. 'f', M.new_float_term, {desc = 'New terminal (float)'})
 
   -- New vertical split terminal
   vim.keymap.set(
