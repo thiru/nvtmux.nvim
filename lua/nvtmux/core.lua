@@ -18,6 +18,7 @@ end
 
 function M.save_original_opts()
   M.state.original_opts = {
+    background = vim.opt.background:get(),
     cursorline = vim.opt.cursorline:get(),
     number = vim.opt.number:get(),
     relativenumber = vim.opt.relativenumber:get(),
@@ -29,6 +30,7 @@ end
 
 --- Set (subjectively) optimal settings for a good terminal experience.
 function M.set_term_opts()
+  vim.opt.background = 'dark'
   vim.opt.cursorline = false
   vim.opt.scrolloff = 0
   vim.opt.number = false
@@ -46,6 +48,7 @@ end
 
 -- Undo options set in `M.set_term_opts`.
 function M.unset_term_opts()
+  vim.opt.background = M.state.original_opts.background
   vim.opt.cursorline = M.state.original_opts.cursorline
   vim.opt.scrolloff = M.state.original_opts.scrolloff
   vim.opt.number = M.state.original_opts.number
@@ -205,6 +208,8 @@ end
 function M.new_tab()
   vim.cmd('tabnew')
 
+  M.set_term_opts()
+
   if M.config.on_before_term_created then
     M.config.on_before_term_created()
   end
@@ -237,8 +242,19 @@ function M.new_float_term()
     style = 'minimal',
   })
 
+  local prev_bg = vim.opt.background:get()
+  vim.opt.background = 'dark'
   vim.cmd.terminal()
   vim.cmd.startinsert()
+
+  local win_id = vim.api.nvim_get_current_win()
+  vim.api.nvim_create_autocmd('WinClosed', {
+    buffer = vim.api.nvim_win_get_buf(win_id),
+    once = true,
+    callback = function()
+      vim.opt.background = prev_bg
+    end,
+  })
 end
 
 --- Show prompt to rename the current tab.
