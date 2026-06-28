@@ -2,20 +2,20 @@
 
 local M = {}
 
-local picker = require('nvtmux.ssh.picker')
-local u = require('nvtmux.utils')
+local picker = require('tabnv.ssh.picker')
+local u = require('tabnv.utils')
 
 --- On SSH authentication requests, at most this many lines will be inspected. This is an optimisation attempt in order to reduce unnecessary processing after a login has succeeded.
 ---@type number
 local max_lines_detect = 50
 
----@class nvtmux.ssh.launcher.BufferCache
+---@class tabnv.ssh.launcher.BufferCache
 ---@field host string SSH hostname, alias or IP address
 ---@field reinject boolean Whether we should reinject a password
 ---@field stdout_line_count number The number of lines read from stdout so far
 
----@class nvtmux.ssh.launcher.State
----@field buffers {[string]: nvtmux.ssh.launcher.BufferCache} Buffer details by bufnr
+---@class tabnv.ssh.launcher.State
+---@field buffers {[string]: tabnv.ssh.launcher.BufferCache} Buffer details by bufnr
 ---@field pwds {[string]: string} Cached passwords by SSH hostname
 M.state = {
   buffers = {},
@@ -23,7 +23,7 @@ M.state = {
 }
 
 --- Setup the launcher.
----@param config nvtmux.Config
+---@param config tabnv.Config
 M.setup = function(config)
   M.config = config.ssh
   M.create_user_commands()
@@ -33,7 +33,7 @@ end
 --- Create user command to facilitate SSH password injection.
 M.create_user_commands = function()
   vim.api.nvim_create_user_command(
-    'NvtmuxSshPwdReinject',
+    'TabnvSshPwdReinject',
     function(opts)
       M.ssh_pwd_reinject(opts.args)
     end,
@@ -67,7 +67,7 @@ M.get_ssh_cmd = function(host, bufnr)
           ' do ' .. ssh_cmd_nested .. ';' ..
           ' printf ' .. confirm_msg .. ';' ..
           ' read -r dummy </dev/tty;' ..
-           (M.config.password_detection.enabled and " nvim --server '" .. nvim_server_name  .. '\' --remote-expr \'execute(\\"NvtmuxSshPwdReinject ' .. bufnr .. '\\")\';' or '') ..
+           (M.config.password_detection.enabled and " nvim --server '" .. nvim_server_name  .. '\' --remote-expr \'execute(\\"TabnvSshPwdReinject ' .. bufnr .. '\\")\';' or '') ..
           ' done"'
   end
 

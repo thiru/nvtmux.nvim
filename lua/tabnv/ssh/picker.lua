@@ -2,14 +2,14 @@
 
 local M = {}
 
-local ssh_parser = require('nvtmux.ssh.parser')
+local ssh_parser = require('tabnv.ssh.parser')
 
 M.selected_host = ''
 
 --- Setup the picker.
----@param config table SSH config (nvtmux.Config.ssh)
+---@param config table SSH config (tabnv.Config.ssh)
 ---@param on_picker_action fun(target: string) This function is run when a picker selection is made
----@see nvtmux.ssh.laucher.open_ssh_terminal
+---@see tabnv.ssh.laucher.open_ssh_terminal
 M.setup = function(config, on_picker_action)
   M.on_picker_action = on_picker_action
   M.config = config

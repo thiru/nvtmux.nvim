@@ -4,10 +4,10 @@ local M = {
   state = {}
 }
 
-local u = require('nvtmux.utils')
+local u = require('tabnv.utils')
 
 --- Setup core aspects of the plugin.
----@param config nvtmux.Config
+---@param config tabnv.Config
 function M.setup(config)
   M.config = config
   M.save_original_opts()
@@ -66,7 +66,7 @@ end
 
 --- Create user commands.
 function M.create_usercmds()
-  vim.api.nvim_create_user_command('NvtmuxStart', function()
+  vim.api.nvim_create_user_command('TabnvStart', function()
     M.set_term_opts()
     vim.cmd.terminal()
     vim.cmd.startinsert()
@@ -82,7 +82,7 @@ function M.create_autocmds()
         u.save_tab_mode_and_coord()
       end
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_winleave', {clear = true}),
+    group = vim.api.nvim_create_augroup('tabnv_winleave', {clear = true}),
     pattern = '*',
   })
   vim.api.nvim_create_autocmd('WinEnter', {
@@ -91,7 +91,7 @@ function M.create_autocmds()
         u.restore_tab_mode_and_coord()
       end
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_winenter', {clear = true}),
+    group = vim.api.nvim_create_augroup('tabnv_winenter', {clear = true}),
     pattern = '*',
   })
 
@@ -99,7 +99,7 @@ function M.create_autocmds()
     callback = function()
       u.update_window_title()
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_bufenter', {clear = true}),
+    group = vim.api.nvim_create_augroup('tabnv_bufenter', {clear = true}),
     pattern = '*',
   })
 
@@ -142,7 +142,7 @@ function M.create_autocmds()
         end
       end)
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_tabenter', {clear = true}),
+    group = vim.api.nvim_create_augroup('tabnv_tabenter', {clear = true}),
     pattern = '*',
   })
 
@@ -151,7 +151,7 @@ function M.create_autocmds()
     callback = function()
       vim.opt_local.modifiable = true
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_termopen', {clear = true}),
+    group = vim.api.nvim_create_augroup('tabnv_termopen', {clear = true}),
     pattern = '*',
   })
 
@@ -160,7 +160,7 @@ function M.create_autocmds()
       -- Avoid "Process exited 0" message
       vim.api.nvim_input('<CR>')
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_termclose', {clear = true}),
+    group = vim.api.nvim_create_augroup('tabnv_termclose', {clear = true}),
     pattern = '*',
   })
 
@@ -178,7 +178,7 @@ function M.create_autocmds()
         end
       end)
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_termleave', {clear = true}),
+    group = vim.api.nvim_create_augroup('tabnv_termleave', {clear = true}),
     pattern = '*',
   })
 
@@ -190,7 +190,7 @@ function M.create_autocmds()
       u.auto_set_tab_name(ev.file)
       u.update_window_title()
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_dirchangedpre', {clear = true}),
+    group = vim.api.nvim_create_augroup('tabnv_dirchangedpre', {clear = true}),
     pattern = '*',
   })
 
@@ -213,7 +213,7 @@ function M.create_autocmds()
         end
       end
     end,
-    group = vim.api.nvim_create_augroup('nvtmux_termrequest', {clear = true})
+    group = vim.api.nvim_create_augroup('tabnv_termrequest', {clear = true})
   })
 end
 
@@ -283,11 +283,11 @@ end
 
 --- Show prompt to set a window prefix.
 function M.set_window_prefix_prompt()
-  local curr_prefix = vim.g.nvtmux_window_prefix or ''
+  local curr_prefix = vim.g.tabnv_window_prefix or ''
   local new_prefix = vim.fn.input('Window Prefix: ', curr_prefix)
 
   if #new_prefix > 0 then
-    vim.g.nvtmux_window_prefix = new_prefix
+    vim.g.tabnv_window_prefix = new_prefix
     u.update_window_title()
   end
 end

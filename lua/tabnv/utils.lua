@@ -79,7 +79,7 @@ end
 
 --- Update the window title according to an optional user-defined prefix and tab name.
 function M.update_window_title()
-  vim.opt.titlestring = (vim.g.nvtmux_window_prefix or '') .. M.get_tab_name()
+  vim.opt.titlestring = (vim.g.tabnv_window_prefix or '') .. M.get_tab_name()
 end
 
 --- Sort the given such that strings starting with alphabetic characters precede those starting
@@ -168,7 +168,7 @@ function M.save_tab_mode_and_coord()
   local coord = vim.api.nvim_win_get_cursor(0)
   vim.api.nvim_tabpage_set_var(tab, 'lastline', coord[1])
   vim.api.nvim_tabpage_set_var(tab, 'lastcol', coord[2])
-  -- vim.notify('nvtmux: saved tab ' .. tab .. ', mode=' .. mode .. ', coord=' .. coord[1] .. ',' .. coord[2]) -- DEBUG
+  -- vim.notify('tabnv: saved tab ' .. tab .. ', mode=' .. mode .. ', coord=' .. coord[1] .. ',' .. coord[2]) -- DEBUG
 end
 
 function M.restore_tab_mode_and_coord()
@@ -194,7 +194,7 @@ function M.restore_tab_mode_and_coord()
         vim.api.nvim_win_set_cursor(0, {last_line, last_col})
       end)
     else
-      vim.notify('nvtmux: last coords not found for current tab', vim.log.levels.ERROR)
+      vim.notify('tabnv: last coords not found for current tab', vim.log.levels.ERROR)
     end
   end
 end

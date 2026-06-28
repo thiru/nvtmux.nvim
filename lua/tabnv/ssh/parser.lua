@@ -2,7 +2,7 @@
 
 local M = {}
 
-local u = require('nvtmux.utils')
+local u = require('tabnv.utils')
 
 --- Parse the user's SSH config for hosts.
 ---@return string[] names A list of host names

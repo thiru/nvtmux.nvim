@@ -1,8 +1,6 @@
-# nvtmux
+# tabnv
 
-> **Note:** This plugin is still in the experimental phase and may make breaking changes.
-
-nvtmux is short for NeoVim Terminal MUltipleXor.
+A Neovim plugin that turns your editor into a terminal multiplexer.
 
 ## Rationale
 
@@ -20,7 +18,7 @@ Minimal lazy.nvim config:
 
 ```lua
 {
-  'thiru/nvtmux.nvim',
+  'thiru/tabnv.nvim',
 
   dependencies = {
      -- NOTE: these are not required unless you want to use the SSH picker and only one is needed
@@ -28,14 +26,14 @@ Minimal lazy.nvim config:
     'ibhagwan/fzf-lua',
   },
 
-  ---@type nvtmux.Config
+  ---@type tabnv.Config
   opts = {},
 }
 ```
 
 ## Configuration
 
-See [config.lua](./lua/nvtmux/config.lua) for the full configuration with defaults. Below is a
+See [config.lua](./lua/tabnv/config.lua) for the full configuration with defaults. Below is a
 summary of the available options:
 
 ```lua
@@ -87,14 +85,14 @@ summary of the available options:
 
 You likely don't want this plugin to start every time you run Neovim as it alters the appearance
 and behaviour considerably in order to behave as a terminal multiplexor. So, you can either start
-it manually after starting Neovim with the `:NvtmuxStart` command, or you can use this command on
+it manually after starting Neovim with the `:TabnvStart` command, or you can use this command on
 start-up like so:
 
 ```shell
-nvim +NvtmuxStart
+nvim +TabnvStart
 ```
 
-As in tmux, nvtmux uses a leader key for many of its commands so that they don't conflict with
+As in tmux, tabnv uses a leader key for many of its commands so that they don't conflict with
 possibly nested vim instances. By default this is set to `<C-;>` (configurable via the `leader`
 option).
 
@@ -138,7 +136,7 @@ option).
 It's also possible to specify a command to run when the terminal starts via a global variable:
 
 ```shell
-nvim +NvtmuxStart --cmd 'lua vim.g.nvtmux_auto_start_cmd = "htop"'
+nvim +TabnvStart --cmd 'lua vim.g.tabnv_auto_start_cmd = "htop"'
 ```
 
 ## Features

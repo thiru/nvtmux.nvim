@@ -2,29 +2,29 @@
 
 local M = {}
 
-local default_config = require('nvtmux.config')
-local core = require('nvtmux.core')
-local ssh = require('nvtmux.ssh')
-local u = require('nvtmux.utils')
+local default_config = require('tabnv.config')
+local core = require('tabnv.core')
+local ssh = require('tabnv.ssh')
+local u = require('tabnv.utils')
 
 M.new_tab = core.new_tab
 M.new_float_term = core.new_float_term
 
 --- Setup and start plugin.
 ---
----@param config nvtmux.Config? Custom user configuration
+---@param config tabnv.Config? Custom user configuration
 ---
----@return nvtmux.Config config The effective configuration in use
+---@return tabnv.Config config The effective configuration in use
 function M.setup(config)
   local merged_config = vim.tbl_deep_extend('force', default_config, config)
 
   core.setup(merged_config)
   ssh.setup(merged_config)
 
-  if vim.g.nvtmux_auto_start_cmd ~= nil and #vim.g.nvtmux_auto_start_cmd > 0 then
+  if vim.g.tabnv_auto_start_cmd ~= nil and #vim.g.tabnv_auto_start_cmd > 0 then
     u.with_timer(100, function()
       vim.schedule(function()
-        vim.fn.feedkeys(vim.g.nvtmux_auto_start_cmd .. "\r\n")
+        vim.fn.feedkeys(vim.g.tabnv_auto_start_cmd .. "\r\n")
       end)
     end)
   end

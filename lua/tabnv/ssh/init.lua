@@ -2,10 +2,10 @@
 
 local M = {}
 
-local launcher = require('nvtmux.ssh.launcher')
+local launcher = require('tabnv.ssh.launcher')
 
 --- Setup the SSH module.
----@param config nvtmux.Config
+---@param config tabnv.Config
 M.setup = function(config)
   launcher.setup(config)
 end
