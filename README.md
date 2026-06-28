@@ -1,5 +1,11 @@
 # tabnv
 
+<div align="center">
+  <img src="logo.svg" alt="logo">
+</div>
+
+--------------------------------------------------------------------------------
+
 A Neovim plugin that turns your editor into a terminal multiplexer.
 
 ## Rationale
