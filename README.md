@@ -4,222 +4,190 @@
   <img src="logo.svg" alt="logo">
 </div>
 
---------------------------------------------------------------------------------
+## what
 
-A Neovim plugin that turns your editor into a terminal multiplexer.
+a [neovim](https://neovim.io/) plugin that turns your editor into a terminal multiplexer
 
-## Rationale
+## why
 
-I use the terminal a lot and I want to have the full power of vim at my disposal to navigate its
-contents. Even the most popular terminal apps (e.g. Ghostty, Kitty) have a fraction of the
-capabilities of vim when it comes to navigating text. So, I use Neovim's terminal emulator.
+- vim motions are the most efficient means of navigating text
+- terminal output is essentially text
+- neovim has a terminal emulator built in
+- the default experience of managing terminals and regular buffers in neovim is not ergonomic
+- with [neovide](https://neovide.dev/) we have a fully cross-platform terminal without compromises
 
-I also like the multiplexing capabilities of tools like tmux, such as tabs and windows. Vim also
-has these capabilities but the out-of-the-box experience is not at all ergonomic when used in
-conjunction with the terminal emulator. The aim of this plugin is to improve this workflow.
+## how - installation
 
-## Installation
+### vim.pack
 
-Minimal lazy.nvim config:
+```lua
+vim.pack.add{'https://github.com/thiru/tabnv.nvim'}
+```
+
+### lazy.nvim
 
 ```lua
 {
   'thiru/tabnv.nvim',
-
-  dependencies = {
-     -- NOTE: these are not required unless you want to use the SSH picker and only one is needed
-    'nvim-telescope/telescope.nvim',
-    'ibhagwan/fzf-lua',
-  },
-
   ---@type tabnv.Config
   opts = {},
 }
 ```
 
-## Configuration
+optional dependency if using the SSH picker (pick one):
+- [telescope](https://github.com/nvim-telescope/telescope.nvim)
+- [fzf-lua](https://github.com/ibhagwan/fzf-lua)
 
-See [config.lua](./lua/tabnv/config.lua) for the full configuration with defaults. Below is a
-summary of the available options:
+## how - usage
+
+- start neovim normally
+  - `<C-t>` to get a tab with a terminal
+  - `<C-S-t>` to get a tab with a regular emtpy buffer
+- start neovim with a terminal
+  - `nvim +TabnvStart`
+
+### common key binds
+
+| Keymap      | Description                           |
+|-------------|---------------------------------------|
+| `<C-space>` | Escape terminal mode (to Normal mode) |
+| `<C-t>`     | New terminal tab                      |
+| `<C-S-t>`   | New tab (non-terminal)                |
+| `<C-j>`     | Go to previous tab                    |
+| `<C-k>`     | Go to next tab                        |
+| `<C-[1-9]>` | Go to the specified numbered tab      |
+| `<C-TAB>`   | Go to last active tab                 |
+| `<C-S-r>`   | Rename current tab                    |
+| `<C-,>`     | Move current tab to the left          |
+| `<C-.>`     | Move current tab to the right         |
+| `<C-v>`     | Paste from system clipboard           |
+
+### leader key binds
+
+| Keymap      | Description                                     |
+|-------------|-------------------------------------------------|
+| `<leader>t` | New terminal tab                                |
+| `<leader>f` | New floating, centred terminal                  |
+| `<leader>v` | New terminal (vertical split)                   |
+| `<leader>h` | New terminal (horizontal split)                 |
+| `<leader>r` | Rename current tab                              |
+| `<leader>p` | Paste from system clipboard                     |
+| `<leader>a` | Go to last accessed tab                         |
+| `<leader>s` | Launch SSH connection picker                    |
+| `<leader>d` | Close current tab                               |
+| `<leader>w` | Set a window prefix (shown in the title)        |
+| `<leader>q` | Safe quit (confirms if multiple terminals open) |
+
+**auto-start command**
+
+you can specify a command to run when the terminal starts via a global variable:
+
+```shell
+nvim +TabnvStart --cmd 'lua vim.g.tabnv_auto_start_cmd = "htop"'
+```
+
+## how - config
+
+- see [config.lua](./lua/tabnv/config.lua) for the full configuration with defaults
+- below is a summary of the available options
 
 ```lua
 {
-  -- Optional colour scheme override. Useful if you prefer a different theme for terminals
-  -- (e.g. a dark theme while using a light theme for editing).
+  -- optional colour scheme override (useful if you prefer a different theme for terminals)
   colorscheme = nil,
 
-  -- The "leader" key used for many key binds (see keymap tables below).
-  -- This avoids conflicts with nested vim instances (similar to tmux's Ctrl-B).
+  -- the "leader" key used for many key binds (see keymap tables below)
+  -- this avoids conflicts with nested vim instances (similar to tmux's Ctrl-B)
   leader = '<C-;>',
 
-  -- Callback invoked right before a terminal buffer is created.
+  -- callback invoked right before a terminal buffer is created
   on_before_term_created = nil,
 
-  -- Callback invoked right after a terminal buffer is created.
+  -- callback invoked right after a terminal buffer is created
   on_after_term_created = nil,
 
-  -- Callback invoked on tab change. Receives a boolean indicating whether the
-  -- newly entered tab is a terminal tab.
+  -- callback invoked on tab change
   on_tab_changed = nil,
 
   ssh = {
-    -- Automatically reconnect SSH sessions when they disconnect. A wrapper
-    -- script loops and prompts the user to reconnect.
+    -- automatically reconnect SSH sessions when they disconnect
     auto_reconnect = true,
 
-    -- Automatically rename the tab to the SSH hostname when connecting.
+    -- automatically rename the tab to the SSH hostname when connecting
     auto_rename_tab = true,
 
     password_detection = {
-      -- Attempt to detect SSH password prompts and cache entered passwords.
+      -- attempt to detect SSH password prompts and cache entered passwords
       enabled = true,
 
-      -- Lua patterns used to detect an SSH authentication request.
+      -- lua patterns used to detect an SSH authentication request
       patterns = {
         'password:$',
         '^Enter passphrase for key.*:$',
       },
     },
 
-    -- Picker backend: 'auto' (try telescope first, then fzf-lua), 'telescope', or 'fzf-lua'
+    -- picker backend: 'auto' (try telescope first, then fzf-lua), 'telescope', or 'fzf-lua'
     picker = 'auto',
   },
 }
 ```
 
-## Usage
+## feature summary
 
-You likely don't want this plugin to start every time you run Neovim as it alters the appearance
-and behaviour considerably in order to behave as a terminal multiplexor. So, you can either start
-it manually after starting Neovim with the `:TabnvStart` command, or you can use this command on
-start-up like so:
+### automatic tab naming
 
-```shell
-nvim +TabnvStart
-```
-
-As in tmux, tabnv uses a leader key for many of its commands so that they don't conflict with
-possibly nested vim instances. By default this is set to `<C-;>` (configurable via the `leader`
-option).
-
-### Leader key bindings
-
-| Keymap       | Description                                      |
-|--------------|--------------------------------------------------|
-| `<leader>t`  | New terminal (tab)                               |
-| `<leader>f`  | New floating, centred terminal                   |
-| `<leader>v`  | New terminal (vertical split)                    |
-| `<leader>h`  | New terminal (horizontal split)                  |
-| `<leader>r`  | Rename current tab                               |
-| `<leader>p`  | Paste from system clipboard                      |
-| `<leader>a`  | Go to alternate (last accessed) tab              |
-| `<leader>s`  | Launch SSH connection picker                     |
-| `<leader>d`  | Close current tab                                |
-| `<leader>w`  | Set a window prefix (shown in the title)         |
-| `<leader>q`  | Safe quit (confirms if multiple terminals open)  |
-
-### Non-leader key bindings
-
-| Keymap         | Description                                      |
-|----------------|--------------------------------------------------|
-| `<C-space>`    | Escape terminal mode (back to Normal mode)       |
-| `<C-j>`        | Terminal mode: Send Down arrow                   |
-| `<C-k>`        | Terminal mode: Send Up arrow                     |
-| `<C-S-t>`      | New terminal (tab)                               |
-| `<C-S-r>`      | Rename current tab                               |
-| `<C-v>`        | Paste from system clipboard                      |
-| `<C-TAB>`      | Next tab                                         |
-| `<C-S-TAB>`    | Previous tab                                     |
-| `<C-S-k>`      | Next tab (alternative)                           |
-| `<C-S-j>`      | Previous tab (alternative)                       |
-| `<C-[1-9]>`    | Go to the specified numbered tab                 |
-| `<C-\`>`       | Go to alternate (last accessed) tab              |
-| `<C-,>`        | Move current tab to the left                     |
-| `<C-.>`        | Move current tab to the right                    |
-
-**Auto-Start Command**
-
-It's also possible to specify a command to run when the terminal starts via a global variable:
-
-```shell
-nvim +TabnvStart --cmd 'lua vim.g.tabnv_auto_start_cmd = "htop"'
-```
-
-## Features
-
-### Automatic tab naming
-
-Tabs are automatically named after their current working directory. If a terminal's directory
-changes (via `cd` or OSC 7 escape sequences), the tab name updates accordingly.
-
-If you manually rename a tab (e.g. via  `<C-S-r>`), the automatic naming is disabled for that tab
+- tabs are automatically named after their current working directory
+- if a terminal's directory changes (via `cd` or OSC 7 escape sequences), the tab name updates accordingly
+- if you manually rename a tab (e.g. via  `<C-S-r>`), the automatic naming is disabled for that tab
 and your custom name is preserved.
 
-### Window title
+### window title
 
-The window/tab title is composed from an optional window prefix (set via `<leader>w`) and the
-tab name itself. This prefix can be used to group related terminals, analogous to tmux windows.
+- the window/tab title is composed from
+  - an optional window prefix (set via `<leader>w`)
+  - the tab name itself
 
-### Floating terminal
+### floating terminal
 
-A centred, floating terminal window can be opened with `<leader>f`. This is useful for quick
-commands without leaving your current layout.
+- a centred, floating terminal window can be opened with `<leader>f`
+- this is useful for quick commands without leaving your current layout
 
-### OSC 7 directory change support
+### osc 7 directory change support
 
-The plugin handles OSC 7 escape sequences (emitted by modern shells via
-[`osc7`](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/osc7) or similar) to track
-directory changes inside the terminal. The tab name and CWD are updated automatically.
+- handles OSC 7 escape sequences (emitted by modern shells via [`osc7`](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/osc7) or similar) to track directory changes inside the terminal
+- the tab name and CWD are updated automatically
 
-### Auto-close empty tabs
+### auto-close empty tabs
 
-When you exit a shell in a terminal tab (TermLeave), the tab is automatically closed if it's
-empty. If it's the last tab, Neovim quits entirely.
+- when you exit a shell in a terminal tab (TermLeave), the tab is automatically closed if it's empty
+- if it's the last tab, neovim quits entirely
 
-### Tab mode and cursor position preservation
+### tab mode and cursor position preservation
 
-The plugin saves and restores the mode (terminal Insert or Normal) and cursor position when
-switching between windows in a tab, so you don't lose your place.
+- saves and restores the mode (terminal Insert or Normal)
+- and cursor position when switching between windows in a tab, so you don't lose your place
 
-### SSH Connection Picker
+### ssh connection picker
 
-The built-in SSH picker parses `~/.ssh/config` and `~/.ssh/known_hosts` and lets you quickly
-connect to any host via a Neovim terminal. It supports **telescope.nvim** and **fzf-lua**.
+- the ssh picker parses `~/.ssh/config` and `~/.ssh/known_hosts` and lets you quickly connect to any host
+- it supports **telescope.nvim** and **fzf-lua**
+- start the picker with `<leader>s` or by running
+  - `:SshPicker`
+- the default action (`<CR>`) will replace the current buffer
+- alternative actions let you open the connection in a
+  - **new tab** (`<C-t>`)
+  - **horizontal split** (`<C-s>`)
+  - **vertical split** (`<C-v>`)
 
-Start the picker with `<leader>s` or by running:
+#### auto-reconnect
 
-```vim
-:SshPicker
-```
+- when `ssh.auto_reconnect` is enabled (default: `true`)
+  - the SSH session is wrapped in a loop
+  - and prompts you to press ENTER to reconnect after the session ends
 
-By default the picker auto-detects which backend is installed (telescope preferred), or you can
-force one by setting `ssh.picker` in your config:
+#### password detection & caching
 
-```lua
-opts = {
-  ssh = {
-    picker = 'fzf-lua', -- or 'telescope' (default: 'auto')
-  },
-}
-```
-
-The default action (`<CR>`) will replace the current buffer. Alternative actions let you open the
-connection in a:
-
-- **new tab** (`<C-t>`)
-- **horizontal split** (`<C-s>`)
-- **vertical split** (`<C-v>`)
-
-#### Auto-reconnect
-
-When `ssh.auto_reconnect` is enabled (default: `true`), the SSH session is wrapped in a loop
-that prompts you to press ENTER to reconnect after the session ends.
-
-#### Password detection & caching
-
-When `ssh.password_detection.enabled` is `true` (default), the plugin monitors terminal output
-for SSH password prompts (using the configured Lua patterns). When a prompt is detected:
-
-1. A `inputsecret()` prompt appears for the password.
-2. The password is cached in memory keyed by hostname.
-3. On subsequent connections to the same host, the cached password is pre-filled.
+- when `ssh.password_detection.enabled` is `true` (default)
+  - terminal output is monitored for ssh password prompts
+  - and caches entered password so you don't have to re-enter it
